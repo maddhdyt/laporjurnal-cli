@@ -1,1 +1,1 @@
-print("ini adalah ")
+print("ini adalah halaman register")
