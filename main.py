@@ -26,7 +26,7 @@ def show_main_menu(user):
         choice = input("\nPilih menu (1-4): ").strip()
         
         if choice == "1":
-            lapor.lapor_jurnal()
+            lapor.lapor_jurnal(user)  # Mengirim user sebagai current_user
         elif choice == "2":
             check.cek_jurnal()
         elif choice == "3":
