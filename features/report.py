@@ -34,7 +34,7 @@ class CekLaporan:
         print(f"{'ID Laporan':<12}{'Nama Jurnal':<30}{'URL Jurnal':<50}{'Alasan':<50}{'Status':<10}{'Reporter':<15}")
         print("="*175)
 
-        # Looping pada seluruh data dan menampilkan ID laporan
+        #looping pada seluruh data dan menampilkan ID laporan
         for index, row in reports.iterrows():
             report_id = row['report_id']
             journal_name = row['journal_name']
