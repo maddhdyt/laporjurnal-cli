@@ -54,15 +54,17 @@ class CekLaporan:
         status = report['status']
         reporter = report['reporter_username'] if not report['is_anonymous'] else "Anonym"
         created_at = report['created_at']
-
+        updated_at = report['updated_at']
+        
         print("\n=== Detail Laporan Jurnal Predator ===")
-        print(f"ID Laporan     : {report_id}")
-        print(f"Nama Jurnal    : {journal_name}")
-        print(f"URL Jurnal     : {journal_url}")
-        print(f"Alasan         : {reason}")
-        print(f"Status         : {status}")
-        print(f"Reporter       : {reporter}")
-        print(f"Tanggal Dibuat : {created_at}")
+        print(f"ID Laporan          : {report_id}")
+        print(f"Nama Jurnal         : {journal_name}")
+        print(f"URL Jurnal          : {journal_url}")
+        print(f"Alasan              : {reason}")
+        print(f"Status              : {status}")
+        print(f"Reporter            : {reporter}")
+        print(f"Tanggal Dibuat      : {created_at}")
+        print(f'Tanggal Diperbarui  : {updated_at}')
         print("="*100)
         
         input("\nTekan Enter untuk kembali ke menu...")
@@ -74,7 +76,7 @@ class CekLaporan:
 
         while True:
             #user menginput id laporan untuk detailnya (ID format: RPT001, RPT002, ...)
-            report_id = input("\nMasukkan ID laporan yang ingin dilihat detailnya (0 untuk kembali): ").strip()
+            report_id = input("\nMasukkan ID laporan yang ingin dilihat detailnya (0 untuk kembali): ").strip().upper()
 
             if report_id == '0':
                 print("\nKembali ke menu...")

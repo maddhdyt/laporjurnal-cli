@@ -56,6 +56,6 @@ class CekJurnal:
         if not matched_reports.empty:
             self.show_report_details(matched_reports.iloc[0])
         else:
-            print("\nJurnal ini tidak terdaftar sebagai jurnal predator.")
+            print("\nData jurnal tidak ditemukan.")
         
         input("Fitur masih dalam tahap pengembangan.")
