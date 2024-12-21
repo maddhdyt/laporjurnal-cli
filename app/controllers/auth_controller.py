@@ -156,6 +156,7 @@ class AuthController:
                 "scopus_url": scopus_url,
                 "sinta_url": sinta_url,
                 "google_scholar_url": google_scholar_url,
+                "role": "validator"
             }
 
             self.validator_model.add_user(new_validator)
@@ -172,28 +173,35 @@ class AuthController:
 
             # Baca data user
             user_data = self.user_model.read_data()
-            user_data["role"] = user_data["role"].fillna("user")
-
-            # Baca data validator
             validator_data = self.validator_model.read_data()
-            validator_data["role"] = "validator"
+
+            # Normalisasi data (hapus spasi tambahan)
+            user_data["username"] = user_data["username"].str.strip()
+            user_data["password"] = user_data["password"].astype(str).str.strip()
+            validator_data["username"] = validator_data["username"].str.strip()
+            validator_data["password"] = validator_data["password"].astype(str).str.strip()
 
             # Gabungkan data user dan validator
-            user_data = user_data[["username", "password", "user_id", "full_name", "role"]]
-            validator_data = validator_data[["username", "password", "validator_id", "full_name", "role"]]
-            validator_data.rename(columns={"validator_id": "user_id"}, inplace=True)
             all_data = pd.concat([user_data, validator_data], ignore_index=True)
 
-            # Cek username dan password
-            user = all_data[(all_data["username"] == username) & (all_data["password"] == password)]
+            # Cek username yang cocok
+            matched_users = all_data[all_data["username"] == username]
+            print("Matched Users by Username:")
+            print(matched_users)
 
+            # Cek password yang cocok
+            user = matched_users[matched_users["password"] == password]
             if not user.empty:
-                self.current_user = user.iloc[0].to_dict()  # Simpan data pengguna yang sedang login
+                self.current_user = user.iloc[0].to_dict()
                 role = self.current_user["role"]
                 print(f"Login successful! Welcome, {self.current_user['full_name']} ({role.capitalize()}).")
                 return role
             else:
-                print("Invalid username or password. Please try again.")
+                if not matched_users.empty:
+                    print("Password mismatch for username:", username)
+                print("Invalid username or password. Please try again.\n")
+
+
 
 
 

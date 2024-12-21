@@ -10,7 +10,7 @@ class UserModel:
     def create_file(self):
         """Membuat file Excel baru dengan header default."""
         if "validator" in self.file_path:
-            columns = ["validator_id", "username", "password", "full_name", "email", "instancy", "academic_position", "scopus_url", "sinta_url", "google_scholar_url"]
+            columns = ["validator_id", "username", "password", "full_name", "email", "instancy", "academic_position", "scopus_url", "sinta_url", "google_scholar_url", "role"]
         else:
             columns = ["user_id", "username", "password", "full_name", "email", "instancy", "role"]
         pd.DataFrame(columns=columns).to_excel(self.file_path, index=False, engine="openpyxl")
@@ -37,7 +37,7 @@ class UserModel:
             data = pd.read_excel(self.file_path, engine="openpyxl")
         except FileNotFoundError:
             # Jika file tidak ada, buat file baru dengan kolom yang sesuai
-            columns = ["validator_id", "username", "password", "full_name", "email", "instancy", "academic_position", "scopus_url", "sinta_url", "google_scholar_url"]
+            columns = ["validator_id", "username", "password", "full_name", "email", "instancy", "academic_position", "scopus_url", "sinta_url", "google_scholar_url", "role"]
             data = pd.DataFrame(columns=columns)
 
         # Tambahkan data user baru

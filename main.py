@@ -62,7 +62,6 @@ def main():
     """Entry point untuk aplikasi."""
     auth = AuthController()
     report_controller = ReportController()
-
     while True:
         clear_screen()
         show_main_menu()
