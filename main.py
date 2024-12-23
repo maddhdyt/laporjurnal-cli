@@ -41,27 +41,36 @@ def user_menu(auth, report_controller):
             print("Invalid choice. Please try again.")
             input("\nPress Enter to try again...")
 
-def validator_menu(report_controller):
+def validator_menu(report_controller, validator_id):
     """Menu khusus untuk validator."""
     while True:
         clear_screen()
-        show_validator_menu()
+        print("=== Validator Menu ===")
+        print("1. View Pending Reports")
+        print("2. View Accepted Reports")
+        print("3. Logout")
         choice = input("Choose an option: ")
+
         if choice == "1":
             clear_screen()
-            report_controller.list_reports(status="Pending")
+            report_controller.list_pending_reports(validator_id)  # Lihat laporan pending
             input("\nPress Enter to return to the validator menu...")
         elif choice == "2":
+            clear_screen()
+            report_controller.list_accepted_reports(validator_id)  # Lihat laporan diterima
+            input("\nPress Enter to return to the validator menu...")
+        elif choice == "3":
             print("Logging out...")
             break
         else:
             print("Invalid choice. Please try again.")
             input("\nPress Enter to try again...")
 
+
 def main():
-    """Entry point untuk aplikasi."""
     auth = AuthController()
     report_controller = ReportController()
+
     while True:
         clear_screen()
         show_main_menu()
@@ -74,17 +83,14 @@ def main():
             elif role == "user":
                 user_menu(auth, report_controller)
             elif role == "validator":
-                validator_menu(report_controller)
+                validator_id = auth.get_current_user_id()  # Dapatkan validator_id
+                validator_menu(report_controller, validator_id)  # Panggil validator_menu dengan validator_id
         elif choice == "2":
-            clear_screen()
             auth.register_user()
-            input("\nPress Enter to return to the main menu...")
         elif choice == "3":
             print("Goodbye!")
             break
-        else:
-            print("Invalid choice. Please try again.")
-            input("\nPress Enter to try again...")
+
 
 if __name__ == "__main__":
     main()
