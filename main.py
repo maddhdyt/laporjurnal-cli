@@ -53,11 +53,11 @@ def validator_menu(report_controller, validator_id):
 
         if choice == "1":
             clear_screen()
-            report_controller.list_pending_reports(validator_id)  # Lihat laporan pending
+            report_controller.list_pending_reports(validator_id)
             input("\nPress Enter to return to the validator menu...")
         elif choice == "2":
             clear_screen()
-            report_controller.list_accepted_reports(validator_id)  # Lihat laporan diterima
+            report_controller.list_accepted_reports(validator_id)
             input("\nPress Enter to return to the validator menu...")
         elif choice == "3":
             print("Logging out...")
@@ -65,6 +65,7 @@ def validator_menu(report_controller, validator_id):
         else:
             print("Invalid choice. Please try again.")
             input("\nPress Enter to try again...")
+
 
 
 def main():

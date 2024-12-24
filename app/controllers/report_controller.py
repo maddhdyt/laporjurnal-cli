@@ -70,14 +70,11 @@ class ReportController:
         report_data.to_excel(self.report_file, index=False, engine="openpyxl")
         print(f"Laporan berhasil dibuat dengan ID: {report_id}")
 
-
-
     def list_pending_reports(self, validator_id):
         """Menampilkan daftar laporan pending."""
         print("\n=== Pending Reports ===")
         try:
             report_data = pd.read_excel(self.report_file, engine="openpyxl")
-
             # Filter laporan dengan status pending
             pending_reports = report_data[report_data["status_laporan"] == "pending"].copy()
 
@@ -86,13 +83,25 @@ class ReportController:
                 return
 
             # Tampilkan laporan pending
-            display_data = pending_reports[["report_id", "tanggal_laporan", "user_id", "journal_name", "journal_url"]].copy()
-            display_data.loc[:, "user_id"] = display_data["user_id"].apply(lambda x: "Anonymous" if pd.isna(x) else x)
+            display_data = pending_reports[["report_id", "tanggal_laporan", "user_id", "journal_name", "journal_url"]]
             print(display_data.to_string(index=False))
+
+            # Submenu untuk pending reports
+            while True:
+                print("\nOptions:")
+                print("1. Accept a report for review")
+                print("2. Back to menu")
+                choice = input("Choose an option: ")
+
+                if choice == "1":
+                    self.accept_report(validator_id)  # Panggil fungsi accept_report
+                    break
+                elif choice == "2":
+                    return
+                else:
+                    print("Invalid choice. Please try again.")
         except FileNotFoundError:
-            print("No reports database found. Please report a journal first.")
-
-
+            print("No reports database found.")
 
     def list_accepted_reports(self, validator_id):
         """Menampilkan daftar laporan yang diterima validator."""
@@ -100,58 +109,34 @@ class ReportController:
         try:
             # Baca data dari file laporan
             report_data = pd.read_excel(self.report_file, engine="openpyxl")
-            # Filter laporan dengan status review dan diterima validator
+
+            # Debugging: Tampilkan semua data sebelum difilter
+            print("\nFull Report Data:")
+            print(report_data)
+
+            # Filter laporan dengan status review dan diterima oleh validator yang login
             accepted_reports = report_data[
-                (report_data["status_laporan"] == "review") & (report_data["validator_id"] == validator_id)
+                (report_data["status_laporan"] == "review") &
+                (report_data["validator_id"].notna()) &  # Pastikan validator_id bukan NaN
+                (report_data["validator_id"] == float(validator_id))  # Bandingkan dengan float
             ].copy()
+
+            # Debugging: Tampilkan data setelah difilter
+            print("\nFiltered Accepted Reports:")
+            print(accepted_reports)
 
             if accepted_reports.empty:
                 print("No accepted reports found.")
                 return
 
             # Tampilkan laporan diterima
-            display_data = accepted_reports[["report_id", "journal_name", "journal_url", "reason"]]
+            display_data = accepted_reports[["report_id", "tanggal_laporan", "journal_name", "journal_url", "reason"]]
             print(display_data.to_string(index=False))
-
-            # Pilih laporan untuk direview
-            while True:
-                print("\nOptions:")
-                print("1. Review a report")
-                print("2. Return a report to pending")
-                print("3. Back to menu")
-                choice = input("Choose an option: ")
-
-                if choice == "1":
-                    self.review_report(report_data, validator_id)
-                    break
-                elif choice == "2":
-                    self.return_report_to_pending(report_data)
-                    break
-                elif choice == "3":
-                    return
-                else:
-                    print("Invalid choice. Please try again.")
         except FileNotFoundError:
             print("No reports database found.")
 
 
-    def accept_report(self, report_data, validator_id):
-        """Menerima laporan untuk direview."""
-        try:
-            report_id = int(input("Enter Report ID to accept: "))
-            if report_id not in report_data["report_id"].values:
-                print("Invalid Report ID.")
-                return
 
-            # Ubah status laporan menjadi review
-            report_data.loc[report_data["report_id"] == report_id, "status_laporan"] = "review"
-            report_data.loc[report_data["report_id"] == report_id, "validator_id"] = validator_id
-            report_data.to_excel(self.report_file, index=False, engine="openpyxl")
-            print(f"Report ID {report_id} has been accepted for review.")
-        except ValueError:
-            print("Invalid input. Please enter a valid Report ID.")
-
-            
     def view_report_details(self, report_data):
         """Menampilkan detail laporan berdasarkan ID."""
         try:
@@ -166,19 +151,31 @@ class ReportController:
         except ValueError:
             print("Invalid input. Please enter a valid Report ID.")
             
-    def review_report(self, report_data, validator_id):
+    def review_report(self, validator_id):
         """Melakukan review laporan."""
         print("\n=== Review Report ===")
         try:
-            report_id = int(input("Enter Report ID to review: "))
-            report = report_data[
-                (report_data["report_id"] == report_id) & (report_data["validator_id"] == validator_id)
+            report_data = pd.read_excel(self.report_file, engine="openpyxl")
+            # Filter laporan yang diterima oleh validator
+            accepted_reports = report_data[
+                (report_data["status_laporan"] == "review") & (report_data["validator_id"] == validator_id)
             ]
 
-            if report.empty:
-                print("No report found with the given ID.")
+            if accepted_reports.empty:
+                print("No reports available for review.")
                 return
 
+            # Pilih laporan untuk review
+            print("\nAccepted Reports:")
+            display_data = accepted_reports[["report_id", "journal_name", "journal_url", "reason"]]
+            print(display_data.to_string(index=False))
+
+            report_id = int(input("Enter Report ID to review: "))
+            if report_id not in accepted_reports["report_id"].values:
+                print("Invalid Report ID.")
+                return
+
+            # Validasi laporan
             print("\nOptions for journal status:")
             print("1. Aman")
             print("2. Predator")
@@ -205,6 +202,79 @@ class ReportController:
             print(f"Report ID {report_id} has been reviewed successfully.")
         except ValueError:
             print("Invalid input. Please enter a valid Report ID.")
+        except FileNotFoundError:
+            print("No reports database found.")
+            
+    def return_report_to_pending(self, report_data):
+        """Mengembalikan laporan ke status pending."""
+        print("\n=== Return Report to Pending ===")
+        try:
+            report_id = int(input("Enter Report ID to return: "))
+            if report_id not in report_data["report_id"].values:
+                print("Invalid Report ID.")
+                return
+
+            # Update status laporan menjadi pending
+            report_data.loc[report_data["report_id"] == report_id, "status_laporan"] = "pending"
+            report_data.loc[report_data["report_id"] == report_id, "validator_id"] = None
+            report_data.to_excel(self.report_file, index=False, engine="openpyxl")
+            print(f"Report ID {report_id} has been returned to pending.")
+        except ValueError:
+            print("Invalid input. Please enter a valid Report ID.")
+
+    def accept_report(self, validator_id):
+        """Menerima laporan untuk direview."""
+        print("\n=== Accept Report ===")
+        try:
+            # Baca data laporan
+            report_data = pd.read_excel(self.report_file, engine="openpyxl")
+
+            # Filter laporan dengan status pending
+            pending_reports = report_data[report_data["status_laporan"] == "pending"].copy()
+
+            if pending_reports.empty:
+                print("No pending reports found.")
+                return
+
+            # Tampilkan laporan pending
+            display_data = pending_reports[["report_id", "tanggal_laporan", "journal_name", "journal_url"]]
+            print(display_data.to_string(index=False))
+
+            # Pilih laporan untuk diterima
+            report_id = int(input("\nEnter Report ID to accept: "))
+            if report_id not in pending_reports["report_id"].values:
+                print("Invalid Report ID.")
+                return
+
+            # Debugging: Tampilkan sebelum perubahan
+            print("\nData Before Update:")
+            print(report_data[report_data["report_id"] == report_id])
+
+            # Ubah status laporan menjadi review dan simpan validator_id
+            report_data.loc[report_data["report_id"] == report_id, "status_laporan"] = "review"
+            report_data.loc[report_data["report_id"] == report_id, "validator_id"] = float(validator_id)  # Simpan sebagai float
+
+            # Debugging: Tampilkan setelah perubahan
+            print("\nData After Update:")
+            print(report_data[report_data["report_id"] == report_id])
+
+            # Simpan data kembali ke file Excel
+            report_data.to_excel(self.report_file, index=False, engine="openpyxl")
+            print(f"Report ID {report_id} has been accepted for review.")
+        except ValueError as ve:
+            print(f"Invalid input or conversion error: {ve}")
+        except FileNotFoundError:
+            print("No reports database found.")
+
+
+
+
+
+
+
+
+
+
 
 
 
