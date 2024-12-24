@@ -229,6 +229,12 @@ class ReportController:
             # Baca data laporan
             report_data = pd.read_excel(self.report_file, engine="openpyxl")
 
+            # Inisialisasi kolom validator_id sebagai string jika belum ada atau semua nilainya NaN
+            if "validator_id" not in report_data.columns:
+                report_data["validator_id"] = None  # Kolom baru dengan nilai None
+            else:
+                report_data["validator_id"] = report_data["validator_id"].astype(str)  # Pastikan tipe string
+
             # Filter laporan dengan status pending
             pending_reports = report_data[report_data["status_laporan"] == "pending"].copy()
 
@@ -252,7 +258,7 @@ class ReportController:
 
             # Ubah status laporan menjadi review dan simpan validator_id
             report_data.loc[report_data["report_id"] == report_id, "status_laporan"] = "review"
-            report_data.loc[report_data["report_id"] == report_id, "validator_id"] = float(validator_id)  # Simpan sebagai float
+            report_data.loc[report_data["report_id"] == report_id, "validator_id"] = str(validator_id)  # Simpan sebagai string
 
             # Debugging: Tampilkan setelah perubahan
             print("\nData After Update:")
@@ -265,6 +271,10 @@ class ReportController:
             print(f"Invalid input or conversion error: {ve}")
         except FileNotFoundError:
             print("No reports database found.")
+
+
+
+
 
 
 
