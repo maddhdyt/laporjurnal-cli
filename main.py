@@ -33,23 +33,29 @@ def user_menu(auth, report_controller):
             print("Invalid choice. Please try again.")
             input("\nPress Enter to continue...")
 
-def validator_menu():
-    """Menu khusus untuk validator."""
+def validator_menu(auth, report_controller):
+    """Menu untuk validator."""
+    validator_id = auth.current_user.get("validator_id")  # Ambil validator_id dari current_user
     while True:
-        clear_screen()
-        show_validator_menu()
-        choice = input("Choose an option: ")
+        clear_screen()  # Bersihkan layar setiap kali kembali ke menu
+        print("\n=== Validator Menu ===")
+        print("1. View Pending Reports")
+        print("2. View Accepted Reports")
+        print("3. Logout")
+        choice = input("Choose an option: ").strip()
 
         if choice == "1":
             clear_screen()
-            print("Validator reviewing feature...")
-            input("\nPress Enter to return to the Validator Menu...")
+            report_controller.list_pending_reports(validator_id)
         elif choice == "2":
+            clear_screen()
+            report_controller.list_accepted_reports(validator_id)
+        elif choice == "3":
             print("Logging out...")
             break
         else:
-            print("Invalid choice. Try again.")
-            input("\nPress Enter to try again...")
+            print("Invalid choice. Please try again.")
+            input("\nPress Enter to continue...")
 
 def admin_menu(auth):
     """Menu untuk admin."""
@@ -85,7 +91,7 @@ def main():
             if role == "user":
                 user_menu(auth, report_controller)
             elif role == "validator":
-                validator_menu()
+                validator_menu(auth, report_controller)
             elif role == "admin":
                 admin_menu(auth)
         elif choice == "2":  # Register User
