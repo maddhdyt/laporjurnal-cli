@@ -7,7 +7,6 @@ def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 def admin_menu(auth):
-    """Menu khusus untuk admin."""
     while True:
         clear_screen()
         show_admin_menu()
@@ -24,7 +23,6 @@ def admin_menu(auth):
             input("\nPress Enter to try again...")
 
 def user_menu(auth, report_controller):
-    """Menu khusus untuk user."""
     while True:
         clear_screen()
         show_user_menu()
@@ -42,7 +40,6 @@ def user_menu(auth, report_controller):
             input("\nPress Enter to try again...")
 
 def validator_menu(report_controller, validator_id):
-    """Menu khusus untuk validator."""
     while True:
         clear_screen()
         print("=== Validator Menu ===")
@@ -84,8 +81,8 @@ def main():
             elif role == "user":
                 user_menu(auth, report_controller)
             elif role == "validator":
-                validator_id = auth.get_current_user_id()  # Dapatkan validator_id
-                validator_menu(report_controller, validator_id)  # Panggil validator_menu dengan validator_id
+                validator_id = auth.get_current_user_id()  
+                validator_menu(report_controller, validator_id) 
         elif choice == "2":
             auth.register_user()
         elif choice == "3":
