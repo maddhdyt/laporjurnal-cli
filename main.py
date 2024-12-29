@@ -60,17 +60,30 @@ def validator_menu(auth, report_controller):
 
 def admin_menu(auth):
     """Menu untuk admin."""
+    admin_controller = AdminController()  # Inisialisasi AdminController
     while True:
         clear_screen()
         print("\n=== Admin Menu ===")
         print("1. Register Validator")
-        print("2. Logout")
+        print("2. View All Reports")  # Fitur baru
+        print("3. View All Users")    # Fitur baru
+        print("4. View All Validators") # Fitur baru
+        print("5. Logout")
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
             auth.register_validator()
             input("\nPress Enter to return to the admin menu...")
         elif choice == "2":
+            admin_controller.view_all_reports()  # Panggil fitur untuk melihat semua laporan
+            input("\nPress Enter to return to the admin menu...")
+        elif choice == "3":
+            admin_controller.view_all_users()  # Panggil fitur untuk melihat semua pengguna
+            input("\nPress Enter to return to the admin menu...")
+        elif choice == "4":
+            admin_controller.view_all_validators()  # Panggil fitur untuk melihat semua validator
+            input("\nPress Enter to return to the admin menu...")
+        elif choice == "5":
             print("Logging out...")
             break
         else:
