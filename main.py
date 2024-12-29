@@ -1,5 +1,6 @@
 from app.controllers.auth_controller import AuthController
 from app.controllers.report_controller import ReportController
+from app.controllers.admin_controller import AdminController
 from app.views.auth_view import show_main_menu, show_user_menu, show_validator_menu, show_admin_menu
 import os
 
