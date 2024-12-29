@@ -84,7 +84,50 @@ class AdminController:
             if validator_data.empty:
                 print("No validators found.")
             else:
-                # Menggunakan tabulate untuk menampilkan tabel dengan format yang lebih rapi
-                print(tabulate(validator_data, headers="keys", tablefmt="fancy_grid"))
+                # Tampilkan ringkasan validator
+                display_data = validator_data[["validator_id", "username", "instancy", "academic_position"]]
+                print(tabulate(display_data, headers="keys", tablefmt="fancy_grid"))
+
+                # Meminta pengguna untuk memasukkan validator_id untuk melihat detail
+                validator_id = input("\nEnter Validator ID to view details or 0 to return: ").strip()
+                if validator_id == "0":
+                    return
+
+                try:
+                    validator_id = int(validator_id)
+                except ValueError:
+                    print("Invalid Validator ID. Please try again.")
+                    return
+
+                # Menampilkan detail validator berdasarkan validator_id
+                self.view_validator_details(validator_id)
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def view_validator_details(self, validator_id):
+        """Menampilkan detail validator berdasarkan Validator ID."""
+        try:
+            validator_data = self.validator_model.read_data()
+            validator = validator_data[validator_data["validator_id"] == validator_id]
+
+            if validator.empty:
+                print("Validator not found.")
+                return
+
+            # Ambil informasi validator
+            validator = validator.iloc[0]  # Ambil baris pertama
+            print("\n=== Validator Details ===")
+            print(f"Validator ID: {validator['validator_id']}")
+            print(f"Username: {validator['username']}")
+            print(f"Full Name: {validator['full_name']}")
+            print(f"Email: {validator['email']}")
+            print(f"Instancy: {validator['instancy']}")
+            print(f"Academic Position: {validator['academic_position']}")
+            print(f"Scopus URL: {validator['scopus_url']}")
+            print(f"Sinta URL: {validator['sinta_url']}")
+            print(f"Google Scholar URL: {validator['google_scholar_url']}")
+            print(f"Role: {validator['role']}")
+
         except Exception as e:
             print(f"Error: {e}")
