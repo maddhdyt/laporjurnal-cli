@@ -1,6 +1,7 @@
 from app.controllers.auth_controller import AuthController
 from app.controllers.report_controller import ReportController
 from app.controllers.admin_controller import AdminController
+from app.controllers.check_controller import CheckController
 from app.views.auth_view import show_main_menu, show_user_menu, show_validator_menu, show_admin_menu
 import os
 
@@ -65,9 +66,9 @@ def admin_menu(auth):
         clear_screen()
         print("\n=== Admin Menu ===")
         print("1. Register Validator")
-        print("2. View All Reports")  # Fitur baru
-        print("3. View All Users")    # Fitur baru
-        print("4. View All Validators") # Fitur baru
+        print("2. View All Reports")  
+        print("3. View All Users")    
+        print("4. View All Validators") 
         print("5. Logout")
         choice = input("Choose an option: ").strip()
 
@@ -75,13 +76,13 @@ def admin_menu(auth):
             auth.register_validator()
             input("\nPress Enter to return to the admin menu...")
         elif choice == "2":
-            admin_controller.view_all_reports()  # Panggil fitur untuk melihat semua laporan
+            admin_controller.view_all_reports() 
             input("\nPress Enter to return to the admin menu...")
         elif choice == "3":
-            admin_controller.view_all_users()  # Panggil fitur untuk melihat semua pengguna
+            admin_controller.view_all_users()  
             input("\nPress Enter to return to the admin menu...")
         elif choice == "4":
-            admin_controller.view_all_validators()  # Panggil fitur untuk melihat semua validator
+            admin_controller.view_all_validators() 
             input("\nPress Enter to return to the admin menu...")
         elif choice == "5":
             print("Logging out...")
@@ -93,6 +94,8 @@ def admin_menu(auth):
 def main():
     auth = AuthController()
     report_controller = ReportController("database/tb_report.csv")
+    check_controller = CheckController("database/tb_report.csv")  # Inisialisasi CheckController
+
 
     while True:
         clear_screen()
@@ -111,7 +114,11 @@ def main():
         elif choice == "2":  # Register User
             auth.register_user()
             input("\nPress Enter to return to the main menu...")
-        elif choice == "3":
+        elif choice == "3":  # Check Journal URL
+            journal_url = input("Enter the journal URL to check: ").strip()
+            check_controller.check_journal_url(journal_url)  # Panggil fungsi untuk memeriksa URL
+            input("\nPress Enter to return to the main menu...")
+        elif choice == "4":
             print("Goodbye!")
             break
         else:

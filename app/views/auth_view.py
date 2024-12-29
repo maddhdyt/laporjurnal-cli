@@ -3,7 +3,8 @@ def show_main_menu():
     print("\n=== Main Menu ===")
     print("1. Login")
     print("2. Register")
-    print("3. Exit")
+    print("3. Check Journal URL")
+    print("4. Exit")
 
 def show_user_menu():
     """Tampilkan menu user."""
