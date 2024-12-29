@@ -339,70 +339,68 @@ class ReportController:
     def manage_report(self, report):
         """Fungsi untuk mengelola laporan yang diterima validator."""
         while True:
+            # Refresh data laporan
+            report_data = pd.read_csv(self.report_file)
+            updated_report = report_data[report_data["report_id"] == report["report_id"]].iloc[0].to_dict()
+
             print("\n=== Manage Report ===")
-            print(f"Report ID: {report['report_id']}")
-            print(f"Reporter Name: {report['full_name'] if not report['is_anonymous'] else 'Anonymous'}")
-            print(f"Journal Name: {report['journal_name']}")
-            print(f"Journal URL: {report['journal_url']}")
-            print(f"Reason: {report['reason']}")
-            print(f"Status Laporan: {report['status_laporan']}")
-            print(f"Status Jurnal: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
-            print(f"Feedback: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
-            print(f"Date Submitted: {report['tanggal_laporan']}")
+            print(f"Report ID: {updated_report['report_id']}")
+            print(f"Reporter Name: {updated_report['full_name'] if not updated_report['is_anonymous'] else 'Anonymous'}")
+            print(f"Journal Name: {updated_report['journal_name']}")
+            print(f"Journal URL: {updated_report['journal_url']}")
+            print(f"Reason: {updated_report['reason']}")
+            print(f"Status Laporan: {updated_report['status_laporan']}")
+            print(f"Status Jurnal: {updated_report['status_jurnal'] if not pd.isna(updated_report['status_jurnal']) else 'N/A'}")
+            print(f"Feedback: {updated_report['feedback'] if not pd.isna(updated_report['feedback']) else 'N/A'}")
+            print(f"Date Submitted: {updated_report['tanggal_laporan']}")
 
             print("\nOptions:")
-            print("1. Update Journal Status")
-            print("2. Provide Feedback")
+            print("1. Validate Report")
             print("3. Mark as Pending")
             print("4. Return to Accepted Reports")
 
             choice = input("Choose an option: ").strip()
 
             if choice == "1":
-                self.update_journal_status(report)
-            elif choice == "2":
-                self.provide_feedback(report)
+                self.validate_report(updated_report)
+                return  # Kembali ke Accepted Reports setelah validasi selesai
             elif choice == "3":
-                self.mark_as_pending(report)
+                self.mark_as_pending(updated_report)
+                return  # Kembali ke Accepted Reports setelah menandai sebagai pending
             elif choice == "4":
-                break
+                break  # Kembali ke halaman Accepted Reports
             else:
                 print("Invalid choice. Please try again.")
 
-    def update_journal_status(self, report):
-        """Mengupdate status jurnal."""
-        print("\n=== Update Journal Status ===")
+    def validate_report(self, report):
+        """Validasi laporan dengan mengupdate status jurnal dan feedback, lalu menandai sebagai done."""
+        print("\n=== Validate Report ===")
+
+        # Update status jurnal
         print("Options: aman, predator, clone")
         new_status = input("Enter new journal status: ").strip().lower()
-
         if new_status not in ["aman", "predator", "clone"]:
             print("Invalid status. Please choose from aman, predator, or clone.")
             return
 
-        try:
-            # Baca data laporan
-            report_data = pd.read_csv(self.report_file)
-
-            # Update status_jurnal
-            report_data.loc[report_data["report_id"] == report["report_id"], "status_jurnal"] = new_status
-            report_data.to_csv(self.report_file, index=False)
-            print("Journal status updated successfully.")
-        except Exception as e:
-            print(f"Error: {e}")
-
-    def provide_feedback(self, report):
-        """Memberikan feedback untuk laporan."""
-        print("\n=== Provide Feedback ===")
+        # Tambahkan feedback
         new_feedback = input("Enter your feedback: ").strip()
 
         try:
             # Baca data laporan
             report_data = pd.read_csv(self.report_file)
 
-            # Update feedback
+            # Update status_jurnal, feedback, dan status_laporan
+            report_data.loc[report_data["report_id"] == report["report_id"], "status_jurnal"] = new_status
             report_data.loc[report_data["report_id"] == report["report_id"], "feedback"] = new_feedback
+            report_data.loc[report_data["report_id"] == report["report_id"], "status_laporan"] = "done"
+
+            # Simpan perubahan ke file CSV
             report_data.to_csv(self.report_file, index=False)
-            print("Feedback updated successfully.")
+            print("Report validated successfully. The status has been updated to 'done'.")
+
+            # Tambahkan konfirmasi sebelum kembali
+            input("\nPress Enter to return to the Accepted Reports...")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -423,7 +421,13 @@ class ReportController:
             report_data.loc[report_data["report_id"] == report["report_id"], "status_laporan"] = "pending"
             report_data.loc[report_data["report_id"] == report["report_id"], "validator_id"] = None
             report_data.to_csv(self.report_file, index=False)
+
             print("Report marked as pending.")
+            input("\nPress Enter to return to the Validator Menu...")
+            raise StopIteration  # Digunakan untuk keluar dari loop manage_report
+
+        except StopIteration:
+            return  # Kembali langsung ke Validator Menu
         except Exception as e:
             print(f"Error: {e}")
 
