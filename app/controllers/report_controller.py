@@ -155,7 +155,6 @@ class ReportController:
             else:
                 print("\nThis report has not been assigned to a validator.")
 
-            input("\nPress Enter to return...")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -356,8 +355,8 @@ class ReportController:
 
             print("\nOptions:")
             print("1. Validate Report")
-            print("3. Mark as Pending")
-            print("4. Return to Accepted Reports")
+            print("2. Mark as Pending")
+            print("3. Return to Accepted Reports")
 
             choice = input("Choose an option: ").strip()
 
