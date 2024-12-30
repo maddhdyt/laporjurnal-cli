@@ -2,7 +2,6 @@ import pandas as pd
 from app.models.user_model import CSVModel
 from tabulate import tabulate
 
-
 class AdminController:
     def __init__(self):
         self.report_model = CSVModel("database/tb_report.csv")
