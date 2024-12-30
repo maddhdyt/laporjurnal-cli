@@ -150,6 +150,9 @@ class ReportController:
                     print(f"Validator Email: {validator['email']}")
                     print(f"Validator Institution: {validator['instancy']}")
                     print(f"Validator Position: {validator['academic_position']}")
+                    print(f"Scopus Profile: {validator['sinta_url']}")
+                    print(f"Sinta Profile: {validator['scopus_url']}")
+                    print(f"Google Scholar Profile: {validator['google_scholar_url']}")
                 else:
                     print("\nNo validator information found.")
             else:
