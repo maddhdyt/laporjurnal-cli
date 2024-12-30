@@ -155,6 +155,7 @@ class ReportController:
             else:
                 print("\nThis report has not been assigned to a validator.")
 
+            input("\nPress Enter to return...")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -174,6 +175,7 @@ class ReportController:
 
             if pending_reports.empty:
                 print("No pending reports available.")
+                input("\nPress Enter to return to the Validator Menu...")
                 return
 
             # Tampilkan laporan dalam bentuk tabel
@@ -270,7 +272,6 @@ class ReportController:
             ]
 
             if accepted_reports.empty:
-                # Handle empty accepted reports
                 print("You have no accepted reports.")
                 print("This page will remain available for future reports.")
                 input("\nPress Enter to return to the Validator Menu...")
@@ -294,11 +295,9 @@ class ReportController:
                 print("Invalid Report ID. Please try again.")
                 return
 
-            # Place the snippet here to validate and manage the report
             if report_id in accepted_reports["report_id"].values:
-                # Select the report and call manage_report
                 selected_report = accepted_reports[accepted_reports["report_id"] == report_id].iloc[0].to_dict()
-                self.manage_report(selected_report)  # Call manage_report with the selected report
+                self.manage_report(selected_report, validator_id)  # Pastikan validator_id dikirim
             else:
                 print("Invalid Report ID. Please try again.")
 
@@ -309,33 +308,39 @@ class ReportController:
             print(f"Error: {e}")
             input("\nPress Enter to return to the Validator Menu...")
 
-    def manage_pending_report(self, report, validator_id):
-        """Mengelola laporan yang berstatus pending."""
-        print("\n=== Pending Report Details ===")
+    def update_report(self, report):
+        """Fungsi untuk memperbarui laporan, termasuk status jurnal dan feedback."""
+        print("\n=== Update Report ===")
+        
+        # Tampilkan informasi laporan saat ini
         print(f"Report ID: {report['report_id']}")
-        print(f"Reporter Name: {report['full_name'] if not report['is_anonymous'] else 'Anonymous'}")
-        print(f"Journal Name: {report['journal_name']}")
-        print(f"Journal URL: {report['journal_url']}")
-        print(f"Reason: {report['reason']}")
-        print(f"Status Laporan: {report['status_laporan']}")
-        print(f"Status Jurnal: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
-        print(f"Feedback: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
-        print(f"Date Submitted: {report['tanggal_laporan']}")
-
-        print("\nOptions:")
-        print("1. Accept this report for review")
-        print("2. Return to Pending Reports")
-
-        choice = input("Choose an option: ").strip()
-
-        if choice == "1":
-            self.accept_report(report, validator_id)
-        elif choice == "2":
+        print(f"Current Journal Status: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
+        
+        # Meminta input untuk status jurnal baru
+        new_status = input("Enter new journal status (aman, predator, clone): ").strip().lower()
+        if new_status not in ["aman", "predator", "clone"]:
+            print("Invalid status. Please choose from aman, predator, or clone.")
             return
-        else:
-            print("Invalid choice. Returning to Pending Reports.")
 
-    def manage_report(self, report):
+        # Meminta input untuk feedback baru
+        new_feedback = input("Enter new feedback: ").strip()
+
+        try:
+            # Baca data laporan
+            report_data = pd.read_csv(self.report_file)
+
+            # Update status_jurnal dan feedback
+            report_data.loc[report_data["report_id"] == report["report_id"], "status_jurnal"] = new_status
+            report_data.loc[report_data["report_id"] == report["report_id"], "feedback"] = new_feedback
+
+            # Simpan kembali ke file CSV
+            report_data.to_csv(self.report_file, index=False)
+            print("Report updated successfully.")
+
+        except Exception as e:
+            print(f"Error updating report: {e}")
+
+    def manage_report(self, report, validator_id):
         """Fungsi untuk mengelola laporan yang diterima validator."""
         while True:
             # Refresh data laporan
@@ -354,20 +359,35 @@ class ReportController:
             print(f"Date Submitted: {updated_report['tanggal_laporan']}")
 
             print("\nOptions:")
-            print("1. Validate Report")
-            print("2. Mark as Pending")
+            
+            # Menampilkan opsi berdasarkan status laporan
+            if updated_report['status_laporan'] == 'review':
+                print("1. Validate Report")
+                print("2. Mark as Pending")
+            elif updated_report['status_laporan'] == 'done':
+                print("1. Update Report")
+            
             print("3. Return to Accepted Reports")
 
             choice = input("Choose an option: ").strip()
 
             if choice == "1":
-                self.validate_report(updated_report)
-                return  # Kembali ke Accepted Reports setelah validasi selesai
+                if updated_report['status_laporan'] == 'review':
+                    self.validate_report(updated_report)
+                    self.list_accepted_reports(validator_id)
+                    return
+                elif updated_report['status_laporan'] == 'done':
+                    self.update_report(updated_report)  # Panggil fungsi update_report
+                    self.list_accepted_reports(validator_id)
+                    return
+            elif choice == "2":
+                if updated_report['status_laporan'] == 'review':
+                    self.mark_as_pending(updated_report)
+                    self.list_accepted_reports(validator_id)
+                    return
             elif choice == "3":
-                self.mark_as_pending(updated_report)
-                return  # Kembali ke Accepted Reports setelah menandai sebagai pending
-            elif choice == "4":
-                break  # Kembali ke halaman Accepted Reports
+                self.list_accepted_reports(validator_id)
+                return
             else:
                 print("Invalid choice. Please try again.")
 
