@@ -25,10 +25,15 @@ class ReportController:
             else:
                 print("Invalid choice. Please enter Y or N.")
 
-        # Input nama jurnal
-        journal_name = input("Enter journal name: ").strip()
+        # Input nama jurnal (tidak boleh kosong)
+        while True:
+            journal_name = input("Enter journal name: ").strip()
+            if journal_name:  # Validasi: nama jurnal tidak boleh kosong
+                break
+            else:
+                print("Journal name cannot be empty. Please try again.")
 
-        # Input URL jurnal
+        # Input URL jurnal (harus dimulai dengan 'http')
         while True:
             journal_url = input("Enter journal URL: ").strip()
             if journal_url.startswith("http"):
@@ -36,8 +41,13 @@ class ReportController:
             else:
                 print("Invalid URL. Please enter a valid URL starting with 'http'.")
 
-        # Input alasan laporan
-        reason = input("Enter your reason for reporting: ").strip()
+        # Input alasan laporan (tidak boleh kosong)
+        while True:
+            reason = input("Enter your reason for reporting: ").strip()
+            if reason:  # Validasi: alasan tidak boleh kosong
+                break
+            else:
+                print("Reason cannot be empty. Please try again.")
 
         # Baca file CSV
         try:
@@ -483,7 +493,7 @@ class ReportController:
             print(f"Error: {e}")
 
     def edit_report(self, report):
-        """Fungsi untuk mengedit laporan yang masih berstatus pending oleh user."""
+        """Fungsi untuk mengedit atau menghapus laporan yang masih berstatus pending oleh user."""
         print("\n=== Edit Report ===")
         
         # Tampilkan informasi laporan saat ini
@@ -491,34 +501,70 @@ class ReportController:
         print(f"Current Journal URL: {report['journal_url']}")
         print(f"Current Reason: {report['reason']}")
 
-        # Meminta input untuk mengedit informasi
-        new_journal_name = input("Enter new journal name (leave blank to keep current): ").strip()
-        new_journal_url = input("Enter new journal URL (leave blank to keep current): ").strip()
-        new_reason = input("Enter new reason (leave blank to keep current): ").strip()
+        # Opsi untuk edit atau hapus
+        print("\nOptions:")
+        print("1. Edit Report")
+        print("2. Delete Report")
+        print("0. Return to Tracking Reports")
 
-        # Update hanya jika input tidak kosong
-        if new_journal_name:
-            report['journal_name'] = new_journal_name
-        if new_journal_url:
-            report['journal_url'] = new_journal_url
-        if new_reason:
-            report['reason'] = new_reason
+        choice = input("Choose an option: ").strip()
 
-        try:
-            # Baca data laporan
-            report_data = pd.read_csv(self.report_file)
+        if choice == "1":
+            # Meminta input untuk mengedit informasi
+            new_journal_name = input("Enter new journal name (leave blank to keep current): ").strip()
+            new_journal_url = input("Enter new journal URL (leave blank to keep current): ").strip()
+            new_reason = input("Enter new reason (leave blank to keep current): ").strip()
 
-            # Update laporan di DataFrame
-            report_data.loc[report_data["report_id"] == report["report_id"], "journal_name"] = report['journal_name']
-            report_data.loc[report_data["report_id"] == report["report_id"], "journal_url"] = report['journal_url']
-            report_data.loc[report_data["report_id"] == report["report_id"], "reason"] = report['reason']
+            # Update hanya jika input tidak kosong
+            if new_journal_name:
+                report['journal_name'] = new_journal_name
+            if new_journal_url:
+                report['journal_url'] = new_journal_url
+            if new_reason:
+                report['reason'] = new_reason
 
-            # Simpan kembali ke file CSV
-            report_data.to_csv(self.report_file, index=False)
-            print("Report updated successfully.")
+            try:
+                # Baca data laporan
+                report_data = pd.read_csv(self.report_file)
 
-            # Tampilkan detail laporan yang telah diperbarui
-            self.view_report_details(report)  # Tampilkan detail setelah edit
+                # Update laporan di DataFrame
+                report_data.loc[report_data["report_id"] == report["report_id"], "journal_name"] = report['journal_name']
+                report_data.loc[report_data["report_id"] == report["report_id"], "journal_url"] = report['journal_url']
+                report_data.loc[report_data["report_id"] == report["report_id"], "reason"] = report['reason']
 
-        except Exception as e:
-            print(f"Error updating report: {e}")
+                # Simpan kembali ke file CSV
+                report_data.to_csv(self.report_file, index=False)
+                print("Report updated successfully.")
+
+                # Tampilkan detail laporan yang telah diperbarui
+                self.view_report_details(report)  # Tampilkan detail setelah edit
+
+            except Exception as e:
+                print(f"Error updating report: {e}")
+
+        elif choice == "2":
+            # Hapus laporan jika statusnya pending
+            if report["status_laporan"] == "pending":
+                confirm = input("Are you sure you want to delete this report? (Y/N): ").strip().lower()
+                if confirm == "y":
+                    try:
+                        # Baca data laporan
+                        report_data = pd.read_csv(self.report_file)
+
+                        # Hapus laporan dari DataFrame
+                        report_data = report_data[report_data["report_id"] != report["report_id"]]
+
+                        # Simpan kembali ke file CSV
+                        report_data.to_csv(self.report_file, index=False)
+                        print("Report deleted successfully.")
+                    except Exception as e:
+                        print(f"Error deleting report: {e}")
+                else:
+                    print("Deletion canceled.")
+            else:
+                print("You can only delete reports with 'pending' status.")
+
+        elif choice == "0":
+            return  # Kembali ke menu Tracking Reports
+        else:
+            print("Invalid choice. Please try again.")
