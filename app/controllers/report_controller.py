@@ -512,7 +512,15 @@ class ReportController:
         if choice == "1":
             # Meminta input untuk mengedit informasi
             new_journal_name = input("Enter new journal name (leave blank to keep current): ").strip()
-            new_journal_url = input("Enter new journal URL (leave blank to keep current): ").strip()
+            
+            # Validasi URL jurnal
+            while True:
+                new_journal_url = input("Enter new journal URL (leave blank to keep current): ").strip()
+                if not new_journal_url or new_journal_url.startswith("http"):
+                    break
+                else:
+                    print("Invalid URL. Please enter a valid URL starting with 'http'.")
+            
             new_reason = input("Enter new reason (leave blank to keep current): ").strip()
 
             # Update hanya jika input tidak kosong
@@ -568,3 +576,30 @@ class ReportController:
             return  # Kembali ke menu Tracking Reports
         else:
             print("Invalid choice. Please try again.")
+            
+    def view_user_statistics(self, user_id):
+        """Menampilkan statistik laporan untuk user tertentu."""
+        try:
+            # Baca data laporan
+            report_data = pd.read_csv(self.report_file)
+
+            # Filter laporan berdasarkan user_id
+            user_reports = report_data[report_data["user_id"] == user_id]
+
+            # Hitung statistik
+            total_reports = len(user_reports)  # Total Laporan
+            pending_reports = len(user_reports[user_reports["status_laporan"] == "pending"])  # Laporan Pending
+            review_reports = len(user_reports[user_reports["status_laporan"] == "review"])  # Laporan Review
+            done_reports = len(user_reports[user_reports["status_laporan"] == "done"])  # Laporan Sukses
+
+            # Tampilkan statistik
+            print("=== Your Report Statistics ===")
+            print(f"Total Laporan: {total_reports}")
+            print(f"Laporan Pending: {pending_reports}")
+            print(f"Laporan Review: {review_reports}")
+            print(f"Laporan Sukses: {done_reports}")
+
+        except FileNotFoundError:
+            print("No report data file found.")
+        except Exception as e:
+            print(f"Error: {e}")
