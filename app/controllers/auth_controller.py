@@ -250,4 +250,80 @@ class AuthController:
             if len(new_url) < 10:
                 print(f"Invalid {url_type} URL. It must be at least 10 characters long.")
                 continue
-            return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi
+            return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi    
+    def user_settings(self):
+        """Fitur untuk mengedit informasi user dan mengubah password."""
+        if not self.current_user:
+            print("You must be logged in to access settings.")
+            return
+
+        while True:
+            print("\n=== User Settings ===")
+            print("1. Edit Profile Information")
+            print("2. Change Password")
+            print("3. Return to User Menu")
+            choice = input("Choose an option: ").strip()
+
+            if choice == "1":
+                self.edit_profile()
+            elif choice == "2":
+                self.change_password()
+            elif choice == "3":
+                break
+            else:
+                print("Invalid choice. Please try again.")
+
+    def edit_profile(self):
+        """Mengedit informasi profil user."""
+        print("\n=== Edit Profile ===")
+        user_data = self.user_model.read_data()
+        user_id = self.current_user["user_id"]
+        user = user_data[user_data["user_id"] == user_id].iloc[0]
+
+        # Tampilkan informasi saat ini
+        print(f"Current Full Name: {user['full_name']}")
+        print(f"Current Email: {user['email']}")
+        print(f"Current Instancy: {user['instancy']}")
+
+        # Input untuk mengedit informasi
+        new_full_name = input("Enter new full name (leave blank to keep current): ").strip()
+        new_email = input("Enter new email (leave blank to keep current): ").strip()
+        new_instancy = input("Enter new instancy (leave blank to keep current): ").strip()
+
+        # Update informasi jika input tidak kosong
+        if new_full_name:
+            user_data.loc[user_data["user_id"] == user_id, "full_name"] = new_full_name
+        if new_email:
+            user_data.loc[user_data["user_id"] == user_id, "email"] = new_email
+        if new_instancy:
+            user_data.loc[user_data["user_id"] == user_id, "instancy"] = new_instancy
+
+        # Simpan perubahan
+        self.user_model.write_data(user_data)
+        print("Profile updated successfully.")
+
+    def change_password(self):
+        """Mengubah password user."""
+        print("\n=== Change Password ===")
+        user_data = self.user_model.read_data()
+        user_id = self.current_user["user_id"]
+        user = user_data[user_data["user_id"] == user_id].iloc[0]
+
+        # Minta password lama untuk verifikasi
+        old_password = input("Enter your current password: ").strip()
+        if old_password != user["password"]:
+            print("Incorrect password. Please try again.")
+            return
+
+        # Minta password baru
+        while True:
+            new_password = input("Enter new password: ").strip()
+            if self.is_valid_password(new_password):
+                break
+            else:
+                print("Password must be at least 8 characters.")
+
+        # Update password
+        user_data.loc[user_data["user_id"] == user_id, "password"] = new_password
+        self.user_model.write_data(user_data)
+        print("Password changed successfully.")

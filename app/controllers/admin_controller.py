@@ -282,7 +282,17 @@ class AdminController:
             print(f"Validator ID: {validator['validator_id']} (Cannot be changed)")
 
             # Input untuk mengedit data
-            new_username = input(f"Enter new username (current: {validator['username']}): ").strip()
+            while True:
+                new_username = input(f"Enter new username (current: {validator['username']}): ").strip()
+                if new_username:
+                    if not self.auth_controller.is_valid_username(new_username):
+                        print("Invalid username. Username must be at least 8 characters and can only contain letters, numbers, '_', and '.'.")
+                        continue
+                    if new_username != validator["username"] and new_username in validator_data["username"].values:
+                        print("Username already exists. Please choose another one.")
+                        continue
+                break
+
             new_full_name = input(f"Enter new full name (current: {validator['full_name']}): ").strip()
             # Validasi email baru
             while True:
@@ -300,6 +310,7 @@ class AdminController:
                 else:
                     break  # Keluar dari loop jika password valid
             new_instancy = input(f"Enter new instancy (current: {validator['instancy']}): ").strip()
+
             new_academic_position = input(f"Enter new academic position (current: {validator['academic_position']}): ").strip()
             # Opsi untuk mengedit URL (Scopus, Sinta, Google Scholar)
             while True:
