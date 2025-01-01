@@ -19,17 +19,16 @@ class CSVModel:
         except Exception as e:
             print(f"Error writing data to {self.file_path}: {e}")
         
-    def delete_data(self, user_id):
-        """Menghapus data berdasarkan user_id."""
+    def delete_data(self, column, value):
+        """Menghapus data dari file CSV berdasarkan kolom dan nilai."""
         try:
             # Baca data dari file CSV
             data = self.read_data()
 
-            # Filter data untuk menghapus baris dengan user_id yang sesuai
-            data = data[data["user_id"] != user_id]
+            # Filter data untuk menghapus baris dengan nilai yang sesuai
+            data = data[data[column] != value]
 
             # Simpan kembali data yang sudah dihapus ke file CSV
             self.write_data(data)
-            print(f"Data with user_id {user_id} has been deleted successfully.")
         except Exception as e:
             print(f"Error deleting data: {e}")

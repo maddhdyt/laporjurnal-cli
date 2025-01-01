@@ -1,5 +1,5 @@
 import pandas as pd
-from app.models.user_model import CSVModel
+from app.models.CSVModel import CSVModel
 import re
 
 class AuthController:
@@ -139,8 +139,13 @@ class AuthController:
             break
 
         # Validasi Full Name
-        full_name = input("Enter full name: ").strip()
-
+        while True:
+            full_name = input("Enter full name: ").strip()
+            if not full_name:
+                print("Full name cannot be empty. Please try again.")
+            else:
+                break
+            
         # Validasi Email
         while True:
             email = input("Enter email: ").strip()
@@ -150,34 +155,44 @@ class AuthController:
             break
 
         # Validasi Instancy
-        instancy = input("Enter instancy: ").strip()
+        while True:
+            instancy = input("Enter instancy: ").strip()
+            if not instancy:
+                print("Instancy cannot be empty. Please try again.")
+            else:
+                break
 
         # Validasi Academic Position
-        academic_position = input("Enter academic position: ").strip()
-
-        # Validasi Scopus URL
         while True:
-            scopus_url = input("Enter Scopus URL: ").strip()
-            if not scopus_url.startswith("http"):
-                print("Invalid Scopus URL. Please enter a valid URL starting with 'http'.")
-                continue
-            break
+            academic_position = input("Enter academic position: ").strip()
+            if not academic_position:
+                print("Academic position cannot be empty. Please try again.")
+            else:
+                break
 
-        # Validasi Sinta URL
-        while True:
-            sinta_url = input("Enter Sinta URL: ").strip()
-            if not sinta_url.startswith("http"):
-                print("Invalid Sinta URL. Please enter a valid URL starting with 'http'.")
-                continue
-            break
+        # Opsi untuk menginput URL (Scopus, Sinta, Google Scholar)
+        scopus_url = ""
+        sinta_url = ""
+        google_scholar_url = ""
 
-        # Validasi Google Scholar URL
         while True:
-            google_scholar_url = input("Enter Google Scholar URL: ").strip()
-            if not google_scholar_url.startswith("http"):
-                print("Invalid Google Scholar URL. Please enter a valid URL starting with 'http'.")
-                continue
-            break
+            print("\nDo you want to add URLs?")
+            print("1. Add Scopus URL")
+            print("2. Add Sinta URL")
+            print("3. Add Google Scholar URL")
+            print("4. Skip URL input")
+            url_choice = input("Choose an option: ").strip()
+
+            if url_choice == "1":
+                scopus_url = self.get_valid_url("Scopus", "")
+            elif url_choice == "2":
+                sinta_url = self.get_valid_url("Sinta", "")
+            elif url_choice == "3":
+                google_scholar_url = self.get_valid_url("Google Scholar", "")
+            elif url_choice == "4":
+                break  # Keluar dari loop jika tidak ingin menginput URL
+            else:
+                print("Invalid choice. Please try again.")
 
         # Tambahkan validator baru
         new_validator = {
@@ -196,21 +211,6 @@ class AuthController:
         validator_data = pd.concat([validator_data, pd.DataFrame([new_validator])], ignore_index=True)
         self.validator_model.write_data(validator_data)
         print("Validator registration successful!")
-        
-    def delete_validator(self, validator_id):
-        """Menghapus akun validator berdasarkan Validator ID."""
-        try:
-            # Baca data validator dari file CSV
-            validator_data = self.validator_model.read_data()
-    
-            # Filter data untuk menghapus baris dengan validator_id yang sesuai
-            validator_data = validator_data[validator_data["validator_id"] != validator_id]
-    
-            # Simpan kembali data yang sudah dihapus ke file CSV
-            self.validator_model.write_data(validator_data)
-            print(f"Validator with ID {validator_id} has been deleted successfully.")
-        except Exception as e:
-            print(f"Error deleting validator: {e}")
 
     def is_valid_username(self, username):
         """Validasi username."""
@@ -229,3 +229,25 @@ class AuthController:
         if self.current_user:
             return self.current_user.get("user_id")
         return None
+
+    def get_valid_url(self, url_type, current_url):
+        """Meminta input URL yang valid untuk Scopus, Sinta, atau Google Scholar."""
+        while True:
+            print(f"\nCurrent {url_type} URL: {current_url}")
+            new_url = input(f"Enter new {url_type} URL (or leave blank to keep current): ").strip()
+
+            # Jika pengguna tidak memasukkan URL, kembalikan URL saat ini
+            if not new_url:
+                return current_url
+
+            # Validasi URL
+            if not new_url.startswith(("http://", "https://")):
+                print(f"Invalid {url_type} URL. It must start with 'http://' or 'https://'.")
+                continue
+            if not new_url.endswith((".com", ".org", ".edu", ".gov", ".net", ".io", ".co.id")):
+                print(f"Invalid {url_type} URL. It must end with a valid domain (e.g., .com, .org, .edu).")
+                continue
+            if len(new_url) < 10:
+                print(f"Invalid {url_type} URL. It must be at least 10 characters long.")
+                continue
+            return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi
