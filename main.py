@@ -13,6 +13,12 @@ def user_menu(auth, report_controller):
     """Menu untuk user."""
     while True:
         clear_screen()
+        user_id = auth.get_current_user_id()
+
+        # Tampilkan statistik laporan user
+        report_controller.view_user_statistics(user_id)
+
+        # Tampilkan menu user
         print("\n=== User Menu ===")
         print("1. Report Journal")
         print("2. Track Reports")
@@ -20,12 +26,10 @@ def user_menu(auth, report_controller):
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
-            user_id = auth.get_current_user_id()
             full_name = auth.current_user["full_name"]
             report_controller.report_journal(user_id, full_name)
             input("\nPress Enter to return to the user menu...")
         elif choice == "2":
-            user_id = auth.get_current_user_id()
             report_controller.track_reports(user_id)
             input("\nPress Enter to return to the user menu...")
         elif choice == "3":
@@ -64,13 +68,12 @@ def admin_menu(auth):
     admin_controller = AdminController()  # Inisialisasi AdminController
     while True:
         clear_screen()
-        print("\n=== Admin Menu ===")
         
         # Tampilkan Statistik
         admin_controller.view_statistics() # Panggil fungsi view_statistics dari AdminController
         
         # Menu Opsi
-        print("\n=== Options ===")
+        print("\n=== Admin Menu ===")
         print("1. Register Validator")
         print("2. View All Reports")  
         print("3. View All Users")    
