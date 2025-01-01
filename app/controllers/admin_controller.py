@@ -40,27 +40,58 @@ class AdminController:
             print(f"Error: {e}")
 
     def view_report_details(self, report_id):
-        """Menampilkan detail laporan berdasarkan Report ID."""
+        """Menampilkan detail laporan sesuai template yang diminta."""
         try:
+            # Baca data laporan
             report_data = self.report_model.read_data()
             report = report_data[report_data["report_id"] == report_id]
-
+    
             if report.empty:
                 print("Report not found.")
                 return
-
+    
             # Ambil informasi laporan
             report = report.iloc[0]  # Ambil baris pertama
+    
+            # Baca data user untuk mendapatkan nama dan instansi pelapor
+            user_data = self.user_model.read_data()
+            user = user_data[user_data["user_id"] == report["user_id"]]
+    
+            # Baca data validator untuk mendapatkan nama, instansi, dan profile validator
+            validator_data = self.validator_model.read_data()
+            validator = validator_data[validator_data["validator_id"] == report["validator_id"]]
+    
+            # Tampilkan detail laporan
             print("\n=== Report Details ===")
             print(f"Report ID: {report['report_id']}")
+            print(f"Date Submitted: {report['tanggal_laporan']}")
             print(f"Journal Name: {report['journal_name']}")
             print(f"Journal URL: {report['journal_url']}")
+            print(f"Nama Pelapor: {user.iloc[0]['full_name'] if not user.empty else 'N/A'}")
+            print(f"Instansi Pelapor: {user.iloc[0]['instancy'] if not user.empty else 'N/A'}")
             print(f"Reason: {report['reason']}")
+    
+            # Tampilkan hasil review (jika ada)
+            print("\n=== Review Result ===")
+            if not validator.empty:
+                validator = validator.iloc[0]  # Ambil baris pertama
+                print(f"Nama Validator: {validator['full_name']}")
+                print(f"Instansi Validator: {validator['instancy']}")
+                print("Profile Validator:")
+                if pd.notna(validator['scopus_url']):
+                    print(f"- {validator['scopus_url']}")
+                if pd.notna(validator['sinta_url']):
+                    print(f"- {validator['sinta_url']}")
+                if pd.notna(validator['google_scholar_url']):
+                    print(f"- {validator['google_scholar_url']}")
+            else:
+                print("Nama Validator: N/A")
+                print("Instansi Validator: N/A")
+                print("Profile Validator: N/A")
+    
             print(f"Status Laporan: {report['status_laporan']}")
-            print(f"Date Submitted: {report['tanggal_laporan']}")
+            print(f"Status Jurnal: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
             print(f"Feedback: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
-            print(f"Validator ID: {report['validator_id'] if not pd.isna(report['validator_id']) else 'N/A'}")
-
         except Exception as e:
             print(f"Error: {e}")
 
