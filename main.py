@@ -26,6 +26,29 @@ def user_menu(auth, report_controller):
         elif choice == "2":
             report_controller.track_reports(user_id)
             input("\nPress Enter to return to the user menu...")
+        elif choice == "3":  # Opsi Settings
+            auth.user_settings()  # Panggil fungsi user_settings dari AuthController
+            input("\nPress Enter to return to the user menu...")
+        elif choice == "4":  # Opsi Logout
+            print("Logging out...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+            input("\nPress Enter to continue...")
+
+        # statistik + user menu
+        report_controller.view_user_statistics(user_id)
+        show_user_menu()
+        
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            full_name = auth.current_user["full_name"]
+            report_controller.report_journal(user_id, full_name)
+            input("\nPress Enter to return to the user menu...")
+        elif choice == "2":
+            report_controller.track_reports(user_id)
+            input("\nPress Enter to return to the user menu...")
         elif choice == "3":
             print("Logging out...")
             break
