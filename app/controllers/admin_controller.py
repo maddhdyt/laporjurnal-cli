@@ -263,15 +263,61 @@ class AdminController:
             print(f"Validator ID: {validator['validator_id']} (Cannot be changed)")
 
             # Input untuk mengedit data
-            new_username = input(f"Enter new username (current: {validator['username']}): ").strip()
+            while True:
+                new_username = input(f"Enter new username (current: {validator['username']}): ").strip()
+                if new_username:
+                    if not self.auth_controller.is_valid_username(new_username):
+                        print("Invalid username. Username must be at least 8 characters and can only contain letters, numbers, '_', and '.'.")
+                        continue
+                    if new_username != validator["username"] and new_username in validator_data["username"].values:
+                        print("Username already exists. Please choose another one.")
+                        continue
+                break
+
             new_full_name = input(f"Enter new full name (current: {validator['full_name']}): ").strip()
-            new_email = input(f"Enter new email (current: {validator['email']}): ").strip()
-            new_password = input(f"Enter new password (current: {validator['password']})").strip()
+
+            while True:
+                new_email = input(f"Enter new email (current: {validator['email']}): ").strip()
+                if new_email:
+                    if not self.auth_controller.is_valid_email(new_email):
+                        print("Invalid email format. Please try again.")
+                        continue
+                break
+
+            while True:
+                new_password = input(f"Enter new password (current: {validator['password']}): ").strip()
+                if new_password:
+                    if not self.auth_controller.is_valid_password(new_password):
+                        print("Password must be at least 8 characters.")
+                        continue
+                break
+
             new_instancy = input(f"Enter new instancy (current: {validator['instancy']}): ").strip()
+
             new_academic_position = input(f"Enter new academic position (current: {validator['academic_position']}): ").strip()
-            new_scopus_url = input(f"Enter new Scopus URL (current: {validator['scopus_url']}): ").strip()
-            new_sinta_url = input(f"Enter new Sinta URL (current: {validator['sinta_url']}): ").strip()
-            new_google_scholar_url = input(f"Enter new Google Scholar URL (current: {validator['google_scholar_url']}): ").strip()
+
+            while True:
+                new_scopus_url = input(f"Enter new Scopus URL (current: {validator['scopus_url']}): ").strip()
+                if new_scopus_url and not new_scopus_url.startswith("http"):
+                    print("Invalid Scopus URL. Please enter a valid URL starting with 'http'.")
+                    continue
+                break
+
+            while True:
+                new_sinta_url = input(f"Enter new Sinta URL (current: {validator['sinta_url']}): ").strip()
+                if new_sinta_url and not new_sinta_url.startswith("http"):
+                    print("Invalid Sinta URL. Please enter a valid URL starting with 'http'.")
+                    continue
+                break
+
+            while True:
+                new_google_scholar_url = input(f"Enter new Google Scholar URL (current: {validator['google_scholar_url']}): ").strip()
+                if new_google_scholar_url and not new_google_scholar_url.startswith("http"):
+                    print("Invalid Google Scholar URL. Please enter a valid URL starting with 'http'.")
+                    continue
+                break
+
+
 
             # Update data validator
             validator_data.loc[validator_data["validator_id"] == validator_id, "username"] = new_username or validator["username"]
