@@ -1,5 +1,4 @@
 def show_main_menu():
-    """Tampilkan menu utama."""
     print("\n=== Main Menu ===")
     print("1. Login")
     print("2. Register")
@@ -7,19 +6,21 @@ def show_main_menu():
     print("4. Exit")
 
 def show_user_menu():
-    """Tampilkan menu user."""
     print("\n=== User Menu ===")
-    print("1. Report a journal")
-    print("2. Logout")
+    print("1. Report Journal")
+    print("2. Track Reports")
+    print("3. Logout")
 
 def show_validator_menu():
-    """Tampilkan menu validator."""
     print("\n=== Validator Menu ===")
-    print("1. Review reports")
-    print("2. Logout")
+    print("1. View Pending Reports")
+    print("2. View Accepted Reports")
+    print("3. Logout")
 
 def show_admin_menu():
-    """Tampilkan menu admin."""
     print("\n=== Admin Menu ===")
-    print("1. Manage users")
-    print("2. Logout")
+    print("1. Register Validator")
+    print("2. View All Reports")  
+    print("3. View All Users")    
+    print("4. View All Validators") 
+    print("5. Logout")

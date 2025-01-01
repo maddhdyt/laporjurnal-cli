@@ -6,23 +6,17 @@ from app.views.auth_view import show_main_menu, show_user_menu, show_validator_m
 import os
 
 def clear_screen():
-    """Membersihkan layar."""
     os.system("cls" if os.name == "nt" else "clear")
 
 def user_menu(auth, report_controller):
-    """Menu untuk user."""
     while True:
         clear_screen()
         user_id = auth.get_current_user_id()
 
-        # Tampilkan statistik laporan user
+        # statistik + user menu
         report_controller.view_user_statistics(user_id)
-
-        # Tampilkan menu user
-        print("\n=== User Menu ===")
-        print("1. Report Journal")
-        print("2. Track Reports")
-        print("3. Logout")
+        show_user_menu()
+        
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
@@ -40,17 +34,14 @@ def user_menu(auth, report_controller):
             input("\nPress Enter to continue...")
 
 def validator_menu(auth, report_controller):
-    """Menu untuk validator."""
-    validator_id = auth.current_user.get("validator_id")  # Ambil validator_id dari current_user
+    validator_id = auth.current_user.get("validator_id") #ambil validator_id yang sedang login
     while True:
-        clear_screen()  # Bersihkan layar setiap kali kembali ke menu
-        # statistik
-        report_controller.show_validator_statistics(validator_id)
+        clear_screen()  
         
-        print("\n=== Validator Menu ===")
-        print("1. View Pending Reports")
-        print("2. View Accepted Reports")
-        print("3. Logout")
+        # statistik + menu validator
+        report_controller.show_validator_statistics(validator_id)
+        show_validator_menu()
+        
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
@@ -68,20 +59,14 @@ def validator_menu(auth, report_controller):
 
 def admin_menu(auth):
     """Menu untuk admin."""
-    admin_controller = AdminController()  # Inisialisasi AdminController
+    admin_controller = AdminController()  # AdminController init
     while True:
         clear_screen()
         
-        # Tampilkan Statistik
-        admin_controller.view_statistics() # Panggil fungsi view_statistics dari AdminController
+        # statistik + admin menu
+        admin_controller.view_statistics()
+        show_admin_menu()
         
-        # Menu Opsi
-        print("\n=== Admin Menu ===")
-        print("1. Register Validator")
-        print("2. View All Reports")  
-        print("3. View All Users")    
-        print("4. View All Validators") 
-        print("5. Logout")
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
@@ -106,8 +91,7 @@ def admin_menu(auth):
 def main():
     auth = AuthController()
     report_controller = ReportController("database/tb_report.csv")
-    check_controller = CheckController("database/tb_report.csv")  # Inisialisasi CheckController
-
+    check_controller = CheckController("database/tb_report.csv") 
 
     while True:
         clear_screen()
