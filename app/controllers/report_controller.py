@@ -606,3 +606,27 @@ class ReportController:
             print("No report data file found.")
         except Exception as e:
             print(f"Error: {e}")
+            
+    def show_validator_statistics(self, validator_id):
+        """Menampilkan statistik laporan untuk validator."""
+        try:
+            # Baca data laporan
+            report_data = pd.read_csv(self.report_file)
+
+            # Hitung statistik
+            total_pending = len(report_data[report_data["status_laporan"] == "pending"])
+            total_review = len(report_data[(report_data["status_laporan"] == "review") & (report_data["validator_id"] == validator_id)])
+            total_done = len(report_data[(report_data["status_laporan"] == "done") & (report_data["validator_id"] == validator_id)])
+            total_handled = total_review + total_done
+
+            # Tampilkan statistik
+            print("\n=== Validator Statistics ===")
+            print(f"Total Laporan Tersedia: {total_pending}")
+            print(f"Laporan yang Sedang Direview: {total_review}")
+            print(f"Laporan yang Sudah Selesai: {total_done}")
+            print(f"Total Laporan Ditangani: {total_handled}")
+
+        except FileNotFoundError:
+            print("No report data found.")
+        except Exception as e:
+            print(f"Error: {e}")
