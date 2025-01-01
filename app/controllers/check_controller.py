@@ -20,6 +20,7 @@ class CheckController:
 
             if journal_info.empty:
                 print("Journal information not found for the provided URL.")
+                return
             else:
                 # Ambil informasi jurnal
                 journal_info = journal_info.iloc[0]  # Ambil baris pertama
