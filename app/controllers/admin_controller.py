@@ -215,3 +215,30 @@ class AdminController:
             self.auth_controller.delete_validator(validator_id)
         except Exception as e:
             print(f"Error: {e}")
+            
+    def view_statistics(self):
+        """Menampilkan statistik/jumlah data."""
+        try:
+            # Baca data dari file CSV
+            report_data = self.report_model.read_data()
+            user_data = self.user_model.read_data()
+            validator_data = self.validator_model.read_data()
+    
+            # Hitung statistik
+            total_reports = len(report_data)  # Total Laporan
+            total_users = len(user_data)  # Jumlah User
+            total_validators = len(validator_data)  # Jumlah Validator
+            pending_reports = len(report_data[report_data["status_laporan"] == "pending"])  # Laporan Pending
+            review_reports = len(report_data[report_data["status_laporan"] == "review"])  # Laporan Review
+            done_reports = len(report_data[report_data["status_laporan"] == "done"])  # Laporan Sukses
+    
+            # Tampilkan statistik dalam format yang rapi
+            print("=== Statistics ===")
+            print(f"Total Laporan: {total_reports}")
+            print(f"Jumlah User: {total_users}")
+            print(f"Jumlah Validator: {total_validators}")
+            print(f"Laporan Pending: {pending_reports}")
+            print(f"Laporan Review: {review_reports}")
+            print(f"Laporan Sukses: {done_reports}")
+        except Exception as e:
+            print(f"Error: {e}")
