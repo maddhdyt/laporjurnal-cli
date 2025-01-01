@@ -77,50 +77,63 @@ class ReportController:
 
     def track_reports(self, user_id):
         """Menampilkan laporan yang telah dibuat oleh pengguna."""
-        print("\n=== Tracking Reports ===")
-        try:
-            # Membaca data laporan
-            report_data = pd.read_csv(self.report_file)
-
-            # Filter laporan berdasarkan user_id
-            user_reports = report_data[report_data["user_id"] == user_id]
-
-            if user_reports.empty:
-                print("You have no reports to track.")
-                input("\nPress Enter to return to the User Menu...")
-                return
-
-            # Tampilkan laporan dalam bentuk tabel
-            from tabulate import tabulate
-            display_data = user_reports[[
-                "report_id", "journal_name", "status_laporan", "tanggal_laporan"
-            ]]
-            print(tabulate(display_data, headers="keys", tablefmt="grid"))
-
-            # Memilih laporan untuk melihat detail atau kembali
-            report_id = input("\nEnter Report ID to view details or 0 to return: ").strip()
-            if report_id == "0":
-                return
-
+        while True:
+            print("\n=== Tracking Reports ===")
             try:
-                report_id = int(report_id)
-            except ValueError:
-                print("Invalid Report ID. Please try again.")
+                # Membaca data laporan
+                report_data = pd.read_csv(self.report_file)
+
+                # Filter laporan berdasarkan user_id
+                user_reports = report_data[report_data["user_id"] == user_id]
+
+                if user_reports.empty:
+                    print("You have no reports to track.")
+                    return  # Directly return if no reports
+
+                # Tampilkan laporan dalam bentuk tabel
+                display_data = user_reports[[
+                    "report_id", "journal_name", "status_laporan", "tanggal_laporan"
+                ]]
+                print(tabulate(display_data, headers="keys", tablefmt="grid"))
+
+                # Memilih laporan untuk melihat detail atau kembali
+                report_id = input("\nEnter Report ID to view details or 0 to return: ").strip()
+                if report_id == "0":
+                    return  # Directly return to the previous menu
+
+                try:
+                    report_id = int(report_id)
+                except ValueError:
+                    print("Invalid Report ID. Please try again.")
+                    continue  # Kembali ke awal loop untuk menampilkan laporan lagi
+
+                if report_id in user_reports["report_id"].values:
+                    selected_report = user_reports[user_reports["report_id"] == report_id].iloc[0].to_dict()
+                    
+                    # Tampilkan detail laporan
+                    self.view_report_details(selected_report)
+
+                    # Cek status laporan dan tawarkan opsi edit
+                    if selected_report["status_laporan"] == "pending":
+                        edit_choice = input("\nPress 1 to edit this report or 0 to return to the Tracking Reports: ").strip()
+                        if edit_choice == '1':
+                            self.edit_report(selected_report)
+                        elif edit_choice == '0':
+                            continue  # Directly continue to the next iteration of the loop
+                        else:
+                            print("Invalid choice. Returning to Tracking Reports...")
+                    else:
+                        print("\nThis report cannot be edited as it is not pending.")
+                        input("\nPress Enter to return to the Tracking Reports...")  # Prompt for Enter before returning
+
+                else:
+                    print("Invalid Report ID. Please try again.")
+
+            except FileNotFoundError:
+                print("No report data file found.")
                 return
-
-            if report_id in user_reports["report_id"].values:
-                # Call view_report_details with the correct arguments
-                selected_report = user_reports[user_reports["report_id"] == report_id].iloc[0].to_dict()
-                self.view_report_details(selected_report)
-            else:
-                print("Invalid Report ID. Please try again.")
-
-        except FileNotFoundError:
-            print("No report data file found.")
-            input("\nPress Enter to return to the User Menu...")
-        except Exception as e:
-            print(f"Error: {e}")
-            input("\nPress Enter to return to the User Menu...")
+            except Exception as e:
+                print(f"Error: {e}")
 
     def view_report_details(self, report):
         """Menampilkan detail laporan berdasarkan Report ID, termasuk informasi validator."""
@@ -150,12 +163,14 @@ class ReportController:
                     print(f"Validator Email: {validator['email']}")
                     print(f"Validator Institution: {validator['instancy']}")
                     print(f"Validator Position: {validator['academic_position']}")
+                    print(f"Scopus Profile: {validator['sinta_url']}")
+                    print(f"Sinta Profile: {validator['scopus_url']}")
+                    print(f"Google Scholar Profile: {validator['google_scholar_url']}")
                 else:
                     print("\nNo validator information found.")
             else:
                 print("\nThis report has not been assigned to a validator.")
 
-            input("\nPress Enter to return...")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -466,3 +481,44 @@ class ReportController:
             print(f"Report ID {report['report_id']} has been accepted for review.")
         except Exception as e:
             print(f"Error: {e}")
+
+    def edit_report(self, report):
+        """Fungsi untuk mengedit laporan yang masih berstatus pending oleh user."""
+        print("\n=== Edit Report ===")
+        
+        # Tampilkan informasi laporan saat ini
+        print(f"Current Journal Name: {report['journal_name']}")
+        print(f"Current Journal URL: {report['journal_url']}")
+        print(f"Current Reason: {report['reason']}")
+
+        # Meminta input untuk mengedit informasi
+        new_journal_name = input("Enter new journal name (leave blank to keep current): ").strip()
+        new_journal_url = input("Enter new journal URL (leave blank to keep current): ").strip()
+        new_reason = input("Enter new reason (leave blank to keep current): ").strip()
+
+        # Update hanya jika input tidak kosong
+        if new_journal_name:
+            report['journal_name'] = new_journal_name
+        if new_journal_url:
+            report['journal_url'] = new_journal_url
+        if new_reason:
+            report['reason'] = new_reason
+
+        try:
+            # Baca data laporan
+            report_data = pd.read_csv(self.report_file)
+
+            # Update laporan di DataFrame
+            report_data.loc[report_data["report_id"] == report["report_id"], "journal_name"] = report['journal_name']
+            report_data.loc[report_data["report_id"] == report["report_id"], "journal_url"] = report['journal_url']
+            report_data.loc[report_data["report_id"] == report["report_id"], "reason"] = report['reason']
+
+            # Simpan kembali ke file CSV
+            report_data.to_csv(self.report_file, index=False)
+            print("Report updated successfully.")
+
+            # Tampilkan detail laporan yang telah diperbarui
+            self.view_report_details(report)  # Tampilkan detail setelah edit
+
+        except Exception as e:
+            print(f"Error updating report: {e}")
