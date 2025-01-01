@@ -40,27 +40,58 @@ class AdminController:
             print(f"Error: {e}")
 
     def view_report_details(self, report_id):
-        """Menampilkan detail laporan berdasarkan Report ID."""
+        """Menampilkan detail laporan sesuai template yang diminta."""
         try:
+            # Baca data laporan
             report_data = self.report_model.read_data()
             report = report_data[report_data["report_id"] == report_id]
-
+    
             if report.empty:
                 print("Report not found.")
                 return
-
+    
             # Ambil informasi laporan
             report = report.iloc[0]  # Ambil baris pertama
+    
+            # Baca data user untuk mendapatkan nama dan instansi pelapor
+            user_data = self.user_model.read_data()
+            user = user_data[user_data["user_id"] == report["user_id"]]
+    
+            # Baca data validator untuk mendapatkan nama, instansi, dan profile validator
+            validator_data = self.validator_model.read_data()
+            validator = validator_data[validator_data["validator_id"] == report["validator_id"]]
+    
+            # Tampilkan detail laporan
             print("\n=== Report Details ===")
             print(f"Report ID: {report['report_id']}")
+            print(f"Date Submitted: {report['tanggal_laporan']}")
             print(f"Journal Name: {report['journal_name']}")
             print(f"Journal URL: {report['journal_url']}")
+            print(f"Nama Pelapor: {user.iloc[0]['full_name'] if not user.empty else 'N/A'}")
+            print(f"Instansi Pelapor: {user.iloc[0]['instancy'] if not user.empty else 'N/A'}")
             print(f"Reason: {report['reason']}")
+    
+            # Tampilkan hasil review (jika ada)
+            print("\n=== Review Result ===")
+            if not validator.empty:
+                validator = validator.iloc[0]  # Ambil baris pertama
+                print(f"Nama Validator: {validator['full_name']}")
+                print(f"Instansi Validator: {validator['instancy']}")
+                print("Profile Validator:")
+                if pd.notna(validator['scopus_url']):
+                    print(f"- {validator['scopus_url']}")
+                if pd.notna(validator['sinta_url']):
+                    print(f"- {validator['sinta_url']}")
+                if pd.notna(validator['google_scholar_url']):
+                    print(f"- {validator['google_scholar_url']}")
+            else:
+                print("Nama Validator: N/A")
+                print("Instansi Validator: N/A")
+                print("Profile Validator: N/A")
+    
             print(f"Status Laporan: {report['status_laporan']}")
-            print(f"Date Submitted: {report['tanggal_laporan']}")
+            print(f"Status Jurnal: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
             print(f"Feedback: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
-            print(f"Validator ID: {report['validator_id'] if not pd.isna(report['validator_id']) else 'N/A'}")
-
         except Exception as e:
             print(f"Error: {e}")
 
@@ -172,7 +203,7 @@ class AdminController:
             print(f"Error: {e}")
 
     def view_validator_details(self, validator_id):
-        """Menampilkan detail validator dan memberikan opsi untuk menghapus."""
+        """Menampilkan detail validator dan memberikan opsi untuk mengedit atau menghapus."""
         try:
             validator_data = self.validator_model.read_data()
             validator = validator_data[validator_data["validator_id"] == validator_id]
@@ -185,6 +216,7 @@ class AdminController:
             validator = validator.iloc[0]  # Ambil baris pertama
             print("\n=== Validator Details ===")
             print(f"Validator ID: {validator['validator_id']}")
+            print(f"Username: {validator['username']}")
             print(f"Full Name: {validator['full_name']}")
             print(f"Email: {validator['email']}")
             print(f"Instancy: {validator['instancy']}")
@@ -193,12 +225,68 @@ class AdminController:
             print(f"Sinta URL: {validator['sinta_url']}")
             print(f"Google Scholar URL: {validator['google_scholar_url']}")
 
-            # Opsi untuk menghapus validator
-            choice = input("\nDo you want to delete this validator? (Y/N): ").strip().lower()
-            if choice == "y":
-                self.delete_validator(validator_id)
+            # Opsi untuk mengedit atau menghapus validator
+            print("\nOptions:")
+            print("1. Edit Validator")
+            print("2. Delete Validator")
+            print("3. Return to Validator List")
+            choice = input("Choose an option: ").strip()
+
+            if choice == "1":
+                self.edit_validator(validator_id)  # Panggil metode edit_validator
+                
+            elif choice == "2":
+                self.delete_validator(validator_id)  # Panggil metode delete_validator
+                
+            elif choice == "3":
+                return
             else:
-                print("Operation canceled.")
+                print("Invalid choice. Please try again.")
+                input("\nPress Enter to continue...")
+        except Exception as e:
+            print(f"Error: {e}")
+            
+    def edit_validator(self, validator_id):
+        """Mengedit data validator berdasarkan Validator ID."""
+        try:
+            # Baca data validator dari file CSV
+            validator_data = self.validator_model.read_data()
+            validator = validator_data[validator_data["validator_id"] == validator_id]
+
+            if validator.empty:
+                print("Validator not found.")
+                return
+
+            # Ambil informasi validator
+            validator = validator.iloc[0]  # Ambil baris pertama
+            print("\n=== Edit Validator ===")
+            print(f"Validator ID: {validator['validator_id']} (Cannot be changed)")
+
+            # Input untuk mengedit data
+            new_username = input(f"Enter new username (current: {validator['username']}): ").strip()
+            new_full_name = input(f"Enter new full name (current: {validator['full_name']}): ").strip()
+            new_email = input(f"Enter new email (current: {validator['email']}): ").strip()
+            new_password = input(f"Enter new password (current: {validator['password']})").strip()
+            new_instancy = input(f"Enter new instancy (current: {validator['instancy']}): ").strip()
+            new_academic_position = input(f"Enter new academic position (current: {validator['academic_position']}): ").strip()
+            new_scopus_url = input(f"Enter new Scopus URL (current: {validator['scopus_url']}): ").strip()
+            new_sinta_url = input(f"Enter new Sinta URL (current: {validator['sinta_url']}): ").strip()
+            new_google_scholar_url = input(f"Enter new Google Scholar URL (current: {validator['google_scholar_url']}): ").strip()
+
+            # Update data validator
+            validator_data.loc[validator_data["validator_id"] == validator_id, "username"] = new_username or validator["username"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "full_name"] = new_full_name or validator["full_name"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "email"] = new_email or validator["email"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "password"] = new_password or validator["password"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "instancy"] = new_instancy or validator["instancy"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "academic_position"] = new_academic_position or validator["academic_position"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "scopus_url"] = new_scopus_url or validator["scopus_url"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "sinta_url"] = new_sinta_url or validator["sinta_url"]
+            validator_data.loc[validator_data["validator_id"] == validator_id, "google_scholar_url"] = new_google_scholar_url or validator["google_scholar_url"]
+
+            # Simpan kembali ke file CSV
+            self.validator_model.write_data(validator_data)
+            print("Validator updated successfully.")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -223,7 +311,7 @@ class AdminController:
             report_data = self.report_model.read_data()
             user_data = self.user_model.read_data()
             validator_data = self.validator_model.read_data()
-    
+
             # Hitung statistik
             total_reports = len(report_data)  # Total Laporan
             total_users = len(user_data)  # Jumlah User
@@ -231,7 +319,7 @@ class AdminController:
             pending_reports = len(report_data[report_data["status_laporan"] == "pending"])  # Laporan Pending
             review_reports = len(report_data[report_data["status_laporan"] == "review"])  # Laporan Review
             done_reports = len(report_data[report_data["status_laporan"] == "done"])  # Laporan Sukses
-    
+
             # Tampilkan statistik dalam format yang rapi
             print("=== Statistics ===")
             print(f"Total Laporan: {total_reports}")
