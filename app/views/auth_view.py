@@ -9,7 +9,8 @@ def show_user_menu():
     print("\n=== User Menu ===")
     print("1. Report Journal")
     print("2. Track Reports")
-    print("3. Logout")
+    print("3. Settings") 
+    print("4. Logout")
 
 def show_validator_menu():
     print("\n=== Validator Menu ===")
