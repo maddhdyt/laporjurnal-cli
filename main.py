@@ -44,6 +44,9 @@ def validator_menu(auth, report_controller):
     validator_id = auth.current_user.get("validator_id")  # Ambil validator_id dari current_user
     while True:
         clear_screen()  # Bersihkan layar setiap kali kembali ke menu
+        # statistik
+        report_controller.show_validator_statistics(validator_id)
+        
         print("\n=== Validator Menu ===")
         print("1. View Pending Reports")
         print("2. View Accepted Reports")

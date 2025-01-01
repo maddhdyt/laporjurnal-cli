@@ -191,10 +191,6 @@ class ReportController:
             # Membaca data laporan
             report_data = pd.read_csv(self.report_file)
 
-            # Konversi validator_id ke string untuk konsistensi
-            report_data["validator_id"] = report_data["validator_id"].fillna("").astype(str)
-            report_data["status_laporan"] = report_data["status_laporan"].fillna("")
-
             # Filter laporan dengan status 'pending'
             pending_reports = report_data[report_data["status_laporan"] == "pending"]
 
@@ -204,10 +200,7 @@ class ReportController:
                 return
 
             # Tampilkan laporan dalam bentuk tabel
-            from tabulate import tabulate
-            display_data = pending_reports[[
-                "report_id", "tanggal_laporan", "journal_name", "journal_url"
-            ]]
+            display_data = pending_reports[["report_id", "tanggal_laporan", "journal_name", "journal_url"]]
             print(tabulate(display_data, headers="keys", tablefmt="grid"))
 
             # Memilih laporan untuk melihat detail atau menerima
@@ -222,11 +215,13 @@ class ReportController:
                 return
 
             if report_id in pending_reports["report_id"].values:
-                selected_report = pending_reports[pending_reports["report_id"] == report_id].iloc[0].to_dict()
-                self.manage_pending_report(selected_report, validator_id)
+                # Panggil fungsi view_pending_report_details
+                self.view_pending_report_details(report_id, validator_id)
             else:
-                print("Invalid Report ID. Please try again.")
+                print("Report ID not found. Please try again.")
 
+        except FileNotFoundError:
+            print("No report data found.")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -247,6 +242,11 @@ class ReportController:
 
             # Ambil informasi laporan
             report = report.iloc[0]
+
+            # Pastikan laporan berstatus "pending"
+            if report["status_laporan"] != "pending":
+                print("This report is not pending and cannot be accepted.")
+                return
 
             # Tentukan nama pelapor berdasarkan is_anonymous
             reporter_name = "Anonymous" if report["is_anonymous"] else report["full_name"]
@@ -271,6 +271,9 @@ class ReportController:
                 print(f"Report ID {report_id} has been accepted for review.")
             else:
                 print("Report was not accepted.")
+
+            # Kembali ke menu validator setelah selesai
+            input("\nPress Enter to return to the Validator Menu...")
 
         except FileNotFoundError:
             print("No report data found.")
@@ -601,5 +604,29 @@ class ReportController:
 
         except FileNotFoundError:
             print("No report data file found.")
+        except Exception as e:
+            print(f"Error: {e}")
+            
+    def show_validator_statistics(self, validator_id):
+        """Menampilkan statistik laporan untuk validator."""
+        try:
+            # Baca data laporan
+            report_data = pd.read_csv(self.report_file)
+
+            # Hitung statistik
+            total_pending = len(report_data[report_data["status_laporan"] == "pending"])
+            total_review = len(report_data[(report_data["status_laporan"] == "review") & (report_data["validator_id"] == validator_id)])
+            total_done = len(report_data[(report_data["status_laporan"] == "done") & (report_data["validator_id"] == validator_id)])
+            total_handled = total_review + total_done
+
+            # Tampilkan statistik
+            print("\n=== Validator Statistics ===")
+            print(f"Total Laporan Tersedia: {total_pending}")
+            print(f"Laporan yang Sedang Direview: {total_review}")
+            print(f"Laporan yang Sudah Selesai: {total_done}")
+            print(f"Total Laporan Ditangani: {total_handled}")
+
+        except FileNotFoundError:
+            print("No report data found.")
         except Exception as e:
             print(f"Error: {e}")
