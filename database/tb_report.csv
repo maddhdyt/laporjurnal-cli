@@ -6,4 +6,4 @@ report_id,user_id,full_name,is_anonymous,journal_name,journal_url,reason,status_
 5,6,ahmad hidayat,False,jurnal.com,https://jurnal.com/edu,testing,done,2024-12-29 11:10:55,1.0,aman,jurnal ini aman
 6,3,ahmad hidayat,False,dfhjsdf,https://jurnalku.com,testing,done,2024-12-29 22:22:49,1.0,aman,aman
 7,3,Anonymous,True,cofunction1,https://dukaatuh.com,test2,done,2025-01-01 15:38:14,1.0,aman,aman
-8,3,ahmad hidayat,False,jurnalinformatika,https://jurnalinformatika.com,testing all,review,2025-01-01 17:32:03,1,,
+8,3,ahmad hidayat,False,jurnalinformatika,https://jurnalinformatika.com,testing all,review,2025-01-01 17:32:03,1.0,,
