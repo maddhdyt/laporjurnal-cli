@@ -1,4 +1,3 @@
 validator_id,username,password,full_name,email,instancy,academic_position,scopus_url,sinta_url,google_scholar_url,role
 1,validator1,securepass,Dr. Alan,alan@example.com,University X,Professor,scopus.com,sinta.com,scholar.com,validator
 2,validator2,12345678,DR. Stark,stark@gmail.com,upi,dosen,sinta.com,sinta.com,sinta.com,validator
-3,validator3,12345678,dr amad,madd@gmail.com,upi,dosen,https://scopus.com,https://sinta.com,https://scholar.com,validator

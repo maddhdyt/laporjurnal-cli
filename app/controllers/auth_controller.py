@@ -196,6 +196,21 @@ class AuthController:
         validator_data = pd.concat([validator_data, pd.DataFrame([new_validator])], ignore_index=True)
         self.validator_model.write_data(validator_data)
         print("Validator registration successful!")
+        
+    def delete_validator(self, validator_id):
+        """Menghapus akun validator berdasarkan Validator ID."""
+        try:
+            # Baca data validator dari file CSV
+            validator_data = self.validator_model.read_data()
+    
+            # Filter data untuk menghapus baris dengan validator_id yang sesuai
+            validator_data = validator_data[validator_data["validator_id"] != validator_id]
+    
+            # Simpan kembali data yang sudah dihapus ke file CSV
+            self.validator_model.write_data(validator_data)
+            print(f"Validator with ID {validator_id} has been deleted successfully.")
+        except Exception as e:
+            print(f"Error deleting validator: {e}")
 
     def is_valid_username(self, username):
         """Validasi username."""

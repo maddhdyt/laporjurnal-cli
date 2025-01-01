@@ -1,7 +1,6 @@
 user_id,username,password,full_name,email,instancy,role
 1,user1,pass123,John Doe,john@example.com,Company A,user
 2,user2,pass456,Jane Smith,jane@example.com,Company B,user
-3,maddhdyt,12345678,ahmad hidayat,madd.hdyt@gmail.com,upi,user
 4,maddhdyt2,12345678,ahmad hidayat,madd@gmail.com,upi,user
 5,sdlkjfskdjf,sdfkjhsdkfg,sdfjkosdfgjdkosf,d@sjfhsjdf.com,dfshdf,user
 6,maddhdyt0,dukahilap,ahmad hidayat,madd.hdyt@gmail.com,upi,user

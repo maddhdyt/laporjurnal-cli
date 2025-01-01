@@ -65,6 +65,12 @@ def admin_menu(auth):
     while True:
         clear_screen()
         print("\n=== Admin Menu ===")
+        
+        # Tampilkan Statistik
+        admin_controller.view_statistics() # Panggil fungsi view_statistics dari AdminController
+        
+        # Menu Opsi
+        print("\n=== Options ===")
         print("1. Register Validator")
         print("2. View All Reports")  
         print("3. View All Users")    
