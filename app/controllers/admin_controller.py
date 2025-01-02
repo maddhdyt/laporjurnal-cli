@@ -257,6 +257,7 @@ class AdminController:
             print(f"Username: {validator['username']}")
             print(f"Full Name: {validator['full_name']}")
             print(f"Email: {validator['email']}")
+            print(f"Password: {validator['password']}")
             print(f"Instancy: {validator['instancy']}")
             print(f"Academic Position: {validator['academic_position']}")
             print(f"Scopus URL: {validator['scopus_url']}")
@@ -266,20 +267,24 @@ class AdminController:
             # Opsi untuk mengedit atau menghapus validator
             while True:
                 print("\nOptions:")
-                print("1. Edit Validator")
-                print("2. Delete Validator")
+                print("1. Edit Information Validator")
+                print("2. Edit Password Validator")
+                print("3. Delete Validator")
                 print("3. Return to Validator List")
                 choice = input("Choose an option: ").strip()
 
                 if choice == "1":
-                    self.edit_validator(validator_id)  # Panggil metode edit_validator
+                    self.edit_validator_information(validator_id)  # Panggil metode edit_validator_information
                     return
                     
                 elif choice == "2":
-                    self.delete_validator(validator_id)  # Panggil metode delete_validator
+                    self.edit_validator_password(validator_id)  # Panggil metode edit_validator_password
                     return
-
+                
                 elif choice == "3":
+                    self.delete_validator(validator_id)  # Panggil metode delete_validator
+
+                elif choice == "4":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
                     return  # Kembali ke menu admin setelah menampilkan tabel
                 else:
@@ -288,7 +293,7 @@ class AdminController:
         except Exception as e:
             print(f"Error: {e}")
             
-    def edit_validator(self, validator_id):
+    def edit_validator_information(self, validator_id):
         try:
             # Baca data validator dari file CSV
             validator_data = self.validator_model.read_data()
@@ -324,14 +329,6 @@ class AdminController:
                     print("Invalid email format. Please enter a valid email address (e.g., example@domain.com).")
                 else:
                     break  # Keluar dari loop jika email valid
-
-            # Validasi password baru
-            while True:
-                new_password = input(f"Enter new password (current: {validator['password']}): ").strip()
-                if len(new_password) < 8:
-                    print("Password must be at least 8 characters.")
-                else:
-                    break  # Keluar dari loop jika password valid
                 
             new_instancy = input(f"Enter new instancy (current: {validator['instancy']}): ").strip()
             new_academic_position = input(f"Enter new academic position (current: {validator['academic_position']}): ").strip()
@@ -363,12 +360,10 @@ class AdminController:
             validator_data.loc[validator_data["validator_id"] == validator_id, "username"] = new_username or validator["username"]
             validator_data.loc[validator_data["validator_id"] == validator_id, "full_name"] = new_full_name or validator["full_name"]
             validator_data.loc[validator_data["validator_id"] == validator_id, "email"] = new_email or validator["email"]
-            validator_data.loc[validator_data["validator_id"] == validator_id, "password"] = new_password or validator["password"]
             validator_data.loc[validator_data["validator_id"] == validator_id, "instancy"] = new_instancy or validator["instancy"]
             validator_data.loc[validator_data["validator_id"] == validator_id, "academic_position"] = new_academic_position or validator["academic_position"]
             
             self.validator_model.write_data(validator_data)
-            print(f"Validator with ID {validator_id} has been updated successfully.")
             
             # Tampilkan validator details yang terbaru
             validator_data = self.validator_model.read_data()
@@ -379,6 +374,7 @@ class AdminController:
             print(f"Username: {validator['username']}")
             print(f"Full Name: {validator['full_name']}")
             print(f"Email: {validator['email']}")
+            print(f"Password: {validator['password']}")
             print(f"Instancy: {validator['instancy']}")
             print(f"Academic Position: {validator['academic_position']}")
             print(f"Scopus URL: {validator['scopus_url']}")
@@ -386,27 +382,108 @@ class AdminController:
             print(f"Google Scholar URL: {validator['google_scholar_url']}")
 
             # Opsi untuk mengedit atau menghapus validator
+            print(f"===" + "Validator information has been updated successfully" + "===")
             while True:
                 print("\nOptions:")
-                print("1. Edit Validator")
-                print("2. Delete Validator")
+                print("1. Edit Information Validator")
+                print("2. Edit Password Validator")
+                print("3. Delete Validator")
                 print("3. Return to Validator List")
                 choice = input("Choose an option: ").strip()
-                
+
                 if choice == "1":
-                    self.edit_validator(validator_id)  # Panggil metode edit_validator lagi
-                    break
+                    self.edit_validator_information(validator_id)  # Panggil metode edit_validator_information
+                    return
+                    
                 elif choice == "2":
-                    self.delete_validator(validator_id)  # Panggil metode delete_validator
-                    break
+                    self.edit_validator_password(validator_id)  # Panggil metode edit_validator_password
+                    return
+                
                 elif choice == "3":
-                    self.view_all_validators()  # Kembali ke daftar validator
-                    break
+                    self.delete_validator(validator_id)  # Panggil metode delete_validator
+
+                elif choice == "4":
+                    self.view_all_validators()  # Tampilkan tabel validator lagi
+                    return  # Kembali ke menu admin setelah menampilkan tabel
                 else:
                     print("Invalid choice. Please try again.")
-                
+                    continue
         except Exception as e:
             print(f"Error: {e}")
+            
+    def edit_validator_password(self, validator_id):
+        try:
+            # Baca data validator dari file CSV
+            validator_data = self.validator_model.read_data()
+            validator = validator_data[validator_data["validator_id"] == validator_id]
+
+            if validator.empty:
+                print("Validator not found.")
+                return
+
+            # Ambil informasi validator
+            validator = validator.iloc[0]  # Ambil baris pertama
+            print("\n=== Edit Validator Password ===")
+
+            while True:
+                new_password = input("Enter new password: ").strip()
+                if self.auth_controller.is_valid_password(new_password):
+                    break
+                else:
+                    print("Invalid password. Password must be at least 8 characters long and contain a mix of letters, numbers, and special characters.")
+
+            # Update password
+            validator_data.loc[validator_data["validator_id"] == validator_id, "password"] = new_password
+
+            # Simpan perubahan ke file CSV
+            self.validator_model.write_data(validator_data)
+            
+            # Tampilkan validator details yang terbaru
+            validator_data = self.validator_model.read_data()
+            validator = validator_data[validator_data["validator_id"] == validator_id].iloc[0]
+
+            print("\n=== Validator Details ===")
+            print(f"Validator ID: {validator['validator_id']}")
+            print(f"Username: {validator['username']}")
+            print(f"Full Name: {validator['full_name']}")
+            print(f"Email: {validator['email']}")
+            print(f"Password: {validator['password']}")
+            print(f"Instancy: {validator['instancy']}")
+            print(f"Academic Position: {validator['academic_position']}")
+            print(f"Scopus URL: {validator['scopus_url']}")
+            print(f"Sinta URL: {validator['sinta_url']}")
+            print(f"Google Scholar URL: {validator['google_scholar_url']}")
+
+            # Opsi untuk mengedit atau menghapus validator
+            print("===" + "Validator password updated successfully" + "===")
+            while True:
+                print("\nOptions:")
+                print("1. Edit Information Validator")
+                print("2. Edit Password Validator")
+                print("3. Delete Validator")
+                print("3. Return to Validator List")
+                choice = input("Choose an option: ").strip()
+
+                if choice == "1":
+                    self.edit_validator_information(validator_id)  # Panggil metode edit_validator_information
+                    return
+                    
+                elif choice == "2":
+                    self.edit_validator_password(validator_id)  # Panggil metode edit_validator_password
+                    return
+                
+                elif choice == "3":
+                    self.delete_validator(validator_id)  # Panggil metode delete_validator
+
+                elif choice == "4":
+                    self.view_all_validators()  # Tampilkan tabel validator lagi
+                    return  # Kembali ke menu admin setelah menampilkan tabel
+                else:
+                    print("Invalid choice. Please try again.")
+                    continue
+        except Exception as e:
+            print(f"Error: {e}")            
+
             
     def delete_validator(self, validator_id):
         try:
