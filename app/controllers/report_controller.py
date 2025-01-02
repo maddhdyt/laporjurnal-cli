@@ -1,4 +1,7 @@
 import pandas as pd
+import re
+import time
+from utils import clear_screen
 from datetime import datetime
 from tabulate import tabulate
 
@@ -8,10 +11,9 @@ class ReportController:
         self.validator_file = "database/tb_validator.csv"
 
     def report_journal(self, user_id, full_name):
-        """Fitur melaporkan jurnal."""
+        clear_screen()
         print("\n=== Report Journal ===")
 
-        # Input apakah ingin melapor sebagai anonim
         while True:
             is_anonymous_input = input("Do you want to report as anonymous? (Y/N): ").strip().lower()
             if is_anonymous_input == "y":
@@ -36,10 +38,10 @@ class ReportController:
         # Input URL jurnal (harus dimulai dengan 'http')
         while True:
             journal_url = input("Enter journal URL: ").strip()
-            if journal_url.startswith("http"):
+            if self.is_valid_url(journal_url):
                 break
             else:
-                print("Invalid URL. Please enter a valid URL starting with 'http'.")
+                print("Invalid URL. Please enter a valid URL starting with 'http://' or 'https://', containing a domain, and without spaces.")
 
         # Input alasan laporan (tidak boleh kosong)
         while True:
@@ -86,44 +88,38 @@ class ReportController:
         print(tabulate([display_report.values()], headers=display_report.keys(), tablefmt="grid"))
 
     def track_reports(self, user_id):
-        """Menampilkan laporan yang telah dibuat oleh pengguna."""
+        clear_screen()
         while True:
             print("\n=== Tracking Reports ===")
             try:
-                # Membaca data laporan
                 report_data = pd.read_csv(self.report_file)
 
-                # Filter laporan berdasarkan user_id
                 user_reports = report_data[report_data["user_id"] == user_id]
 
                 if user_reports.empty:
                     print("You have no reports to track.")
-                    return  # Directly return if no reports
-
-                # Tampilkan laporan dalam bentuk tabel
+                    return 
+                
                 display_data = user_reports[[
                     "report_id", "journal_name", "status_laporan", "tanggal_laporan"
                 ]]
                 print(tabulate(display_data, headers="keys", tablefmt="grid"))
 
-                # Memilih laporan untuk melihat detail atau kembali
                 report_id = input("\nEnter Report ID to view details or 0 to return: ").strip()
                 if report_id == "0":
-                    return  # Directly return to the previous menu
+                    return  
 
                 try:
                     report_id = int(report_id)
                 except ValueError:
                     print("Invalid Report ID. Please try again.")
-                    continue  # Kembali ke awal loop untuk menampilkan laporan lagi
+                    continue 
 
                 if report_id in user_reports["report_id"].values:
                     selected_report = user_reports[user_reports["report_id"] == report_id].iloc[0].to_dict()
                     
-                    # Tampilkan detail laporan
                     self.view_report_details(selected_report)
-
-                    # Cek status laporan dan tawarkan opsi edit
+                    
                     if selected_report["status_laporan"] == "pending":
                         edit_choice = input("\nPress 1 to edit this report or 0 to return to the Tracking Reports: ").strip()
                         if edit_choice == '1':
@@ -134,7 +130,8 @@ class ReportController:
                             print("Invalid choice. Returning to Tracking Reports...")
                     else:
                         print("\nThis report cannot be edited as it is not pending.")
-                        input("\nPress Enter to return to the Tracking Reports...")  # Prompt for Enter before returning
+                        input("\nPress Enter to return to the Tracking Reports...")
+                        clear_screen()
 
                 else:
                     print("Invalid Report ID. Please try again.")
@@ -146,10 +143,9 @@ class ReportController:
                 print(f"Error: {e}")
 
     def view_report_details(self, report):
-        """Menampilkan detail laporan berdasarkan Report ID, termasuk informasi validator."""
+        clear_screen()
         print("\n=== Report Details ===")
         try:
-            # Display basic report details
             print(f"Report ID: {report['report_id']}")
             print(f"Journal Name: {report['journal_name']}")
             print(f"Journal URL: {report['journal_url']}")
@@ -161,10 +157,8 @@ class ReportController:
 
             # Check if the report has been assigned to a validator
             if not pd.isna(report["validator_id"]):
-                # Read validator data
                 validator_data = pd.read_csv("database/tb_validator.csv")
 
-                # Find the validator
                 validator = validator_data[validator_data["validator_id"] == int(report["validator_id"])]
                 if not validator.empty:
                     validator = validator.iloc[0]  # Get the first match
@@ -337,14 +331,11 @@ class ReportController:
             input("\nPress Enter to return to the Validator Menu...")
 
     def update_report(self, report):
-        """Fungsi untuk memperbarui laporan, termasuk status jurnal dan feedback."""
         print("\n=== Update Report ===")
         
-        # Tampilkan informasi laporan saat ini
         print(f"Report ID: {report['report_id']}")
         print(f"Current Journal Status: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
         
-        # Meminta input untuk status jurnal baru
         new_status = input("Enter new journal status (aman, predator, clone): ").strip().lower()
         if new_status not in ["aman", "predator", "clone"]:
             print("Invalid status. Please choose from aman, predator, or clone.")
@@ -496,15 +487,11 @@ class ReportController:
             print(f"Error: {e}")
 
     def edit_report(self, report):
-        """Fungsi untuk mengedit atau menghapus laporan yang masih berstatus pending oleh user."""
+        clear_screen()
         print("\n=== Edit Report ===")
-        
-        # Tampilkan informasi laporan saat ini
         print(f"Current Journal Name: {report['journal_name']}")
         print(f"Current Journal URL: {report['journal_url']}")
         print(f"Current Reason: {report['reason']}")
-
-        # Opsi untuk edit atau hapus
         print("\nOptions:")
         print("1. Edit Report")
         print("2. Delete Report")
@@ -513,16 +500,16 @@ class ReportController:
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
-            # Meminta input untuk mengedit informasi
             new_journal_name = input("Enter new journal name (leave blank to keep current): ").strip()
             
-            # Validasi URL jurnal
             while True:
                 new_journal_url = input("Enter new journal URL (leave blank to keep current): ").strip()
-                if not new_journal_url or new_journal_url.startswith("http"):
+                if not new_journal_url:
                     break
+                elif not self.is_valid_url(new_journal_url):
+                    print("Invalid URL. Please enter a valid URL starting with 'http://' or 'https://', containing a domain, and without spaces.")
                 else:
-                    print("Invalid URL. Please enter a valid URL starting with 'http'.")
+                    break
             
             new_reason = input("Enter new reason (leave blank to keep current): ").strip()
 
@@ -545,7 +532,8 @@ class ReportController:
 
                 # Simpan kembali ke file CSV
                 report_data.to_csv(self.report_file, index=False)
-                print("Report updated successfully.")
+                print("Report updated successfully. Redirecting...")
+                time.sleep(2)
 
                 # Tampilkan detail laporan yang telah diperbarui
                 self.view_report_details(report)  # Tampilkan detail setelah edit
@@ -567,7 +555,8 @@ class ReportController:
 
                         # Simpan kembali ke file CSV
                         report_data.to_csv(self.report_file, index=False)
-                        print("Report deleted successfully.")
+                        print("Report deleted successfully, Redirecting...")
+                        time.sleep(2)
                     except Exception as e:
                         print(f"Error deleting report: {e}")
                 else:
@@ -581,21 +570,16 @@ class ReportController:
             print("Invalid choice. Please try again.")
             
     def view_user_statistics(self, user_id):
-        """Menampilkan statistik laporan untuk user tertentu."""
         try:
-            # Baca data laporan
             report_data = pd.read_csv(self.report_file)
 
-            # Filter laporan berdasarkan user_id
             user_reports = report_data[report_data["user_id"] == user_id]
 
-            # Hitung statistik
             total_reports = len(user_reports)  # Total Laporan
             pending_reports = len(user_reports[user_reports["status_laporan"] == "pending"])  # Laporan Pending
             review_reports = len(user_reports[user_reports["status_laporan"] == "review"])  # Laporan Review
             done_reports = len(user_reports[user_reports["status_laporan"] == "done"])  # Laporan Sukses
 
-            # Tampilkan statistik
             print("=== Your Report Statistics ===")
             print(f"Total Laporan: {total_reports}")
             print(f"Laporan Pending: {pending_reports}")
@@ -630,3 +614,15 @@ class ReportController:
             print("No report data found.")
         except Exception as e:
             print(f"Error: {e}")
+            
+    # Validation Rule
+    def is_valid_url(self, url):
+        """Validasi URL menggunakan regex."""
+        return re.match(r"^(http|https)://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/[^ ]*)?$", url) is not None and ' ' not in url
+    
+    
+    # User Functions
+    
+    
+    
+    #Validator Functions
