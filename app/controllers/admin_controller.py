@@ -270,7 +270,7 @@ class AdminController:
                 print("1. Edit Information Validator")
                 print("2. Edit Password Validator")
                 print("3. Delete Validator")
-                print("3. Return to Validator List")
+                print("4. Return to Validator List")
                 choice = input("Choose an option: ").strip()
 
                 if choice == "1":
@@ -388,7 +388,7 @@ class AdminController:
                 print("1. Edit Information Validator")
                 print("2. Edit Password Validator")
                 print("3. Delete Validator")
-                print("3. Return to Validator List")
+                print("4. Return to Validator List")
                 choice = input("Choose an option: ").strip()
 
                 if choice == "1":
@@ -461,7 +461,7 @@ class AdminController:
                 print("1. Edit Information Validator")
                 print("2. Edit Password Validator")
                 print("3. Delete Validator")
-                print("3. Return to Validator List")
+                print("4. Return to Validator List")
                 choice = input("Choose an option: ").strip()
 
                 if choice == "1":
