@@ -1,3 +1,4 @@
+from utils import clear_screen
 import pandas as pd
 from app.models.CSVModel import CSVModel
 import re
@@ -256,6 +257,8 @@ class AuthController:
         if not self.current_user:
             print("You must be logged in to access settings.")
             return
+        
+        clear_screen()
 
         while True:
             print("\n=== User Settings ===")
@@ -287,7 +290,18 @@ class AuthController:
 
         # Input untuk mengedit informasi
         new_full_name = input("Enter new full name (leave blank to keep current): ").strip()
-        new_email = input("Enter new email (leave blank to keep current): ").strip()
+        
+        # Validasi email baru
+        while True:
+            new_email = input("Enter new email (leave blank to keep current): ").strip()
+            if new_email:  # Jika pengguna memasukkan email baru
+                if not self.is_valid_email(new_email):  # Validasi email
+                    print("Invalid email format. Please enter a valid email address (e.g., example@domain.com).")
+                else:
+                    break  # Keluar dari loop jika email valid
+            else:
+                break  # Keluar dari loop jika pengguna tidak memasukkan email baru
+
         new_instancy = input("Enter new instancy (leave blank to keep current): ").strip()
 
         # Update informasi jika input tidak kosong
