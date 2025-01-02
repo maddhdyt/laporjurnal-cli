@@ -11,10 +11,10 @@ class AuthController:
         self.admin_model = CSVModel("database/tb_admin.csv")
 
     def login(self):
-        """Proses login multi-role dengan pesan kesalahan yang jelas."""
+        # Multi Role Login
         print("\n=== Login ===")
 
-        while True:  # Loop untuk mencoba kembali jika login gagal
+        while True:
             username = input("Enter username: ").strip()
             password = input("Enter password: ").strip()
 
@@ -55,14 +55,13 @@ class AuthController:
                         print("Invalid password. Please try again.")
                         continue
 
-                # Jika username tidak ditemukan
                 print("Invalid username. Please try again.")
             except Exception as e:
                 print(f"Error: {e}")
                 return None
 
     def register_user(self):
-        """Proses registrasi user."""
+        clear_screen()
         print("\n=== Register User ===")
 
         # Validasi Username
@@ -115,7 +114,7 @@ class AuthController:
         print("Registration successful!")
     
     def register_validator(self):
-        """Proses registrasi validator (hanya bisa dilakukan oleh admin)."""
+        clear_screen()
         print("\n=== Register Validator ===")
 
         # Validasi Username
@@ -213,45 +212,7 @@ class AuthController:
         self.validator_model.write_data(validator_data)
         print("Validator registration successful!")
 
-    def is_valid_username(self, username):
-        """Validasi username."""
-        return re.match(r"^[a-zA-Z0-9_.]{8,}$", username)
-
-    def is_valid_password(self, password):
-        """Validasi password."""
-        return len(password) >= 8
-
-    def is_valid_email(self, email):
-        """Validasi email menggunakan regex yang benar."""
-        return re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email) is not None
-
-    def get_current_user_id(self):
-        """Kembalikan user_id dari pengguna yang login."""
-        if self.current_user:
-            return self.current_user.get("user_id")
-        return None
-
-    def get_valid_url(self, url_type, current_url):
-        """Meminta input URL yang valid untuk Scopus, Sinta, atau Google Scholar."""
-        while True:
-            print(f"\nCurrent {url_type} URL: {current_url}")
-            new_url = input(f"Enter new {url_type} URL (or leave blank to keep current): ").strip()
-
-            # Jika pengguna tidak memasukkan URL, kembalikan URL saat ini
-            if not new_url:
-                return current_url
-
-            # Validasi URL
-            if not new_url.startswith(("http://", "https://")):
-                print(f"Invalid {url_type} URL. It must start with 'http://' or 'https://'.")
-                continue
-            if not new_url.endswith((".com", ".org", ".edu", ".gov", ".net", ".io", ".co.id")):
-                print(f"Invalid {url_type} URL. It must end with a valid domain (e.g., .com, .org, .edu).")
-                continue
-            if len(new_url) < 10:
-                print(f"Invalid {url_type} URL. It must be at least 10 characters long.")
-                continue
-            return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi    
+    # User Setting Functionality
     def user_settings(self):
         """Fitur untuk mengedit informasi user dan mengubah password."""
         if not self.current_user:
@@ -341,3 +302,46 @@ class AuthController:
         user_data.loc[user_data["user_id"] == user_id, "password"] = new_password
         self.user_model.write_data(user_data)
         print("Password changed successfully.")
+        
+    # Validation Rule
+    def is_valid_username(self, username):
+        """Validasi username."""
+        return re.match(r"^[a-zA-Z0-9_.]{8,}$", username)
+
+    def is_valid_password(self, password):
+        """Validasi password."""
+        return len(password) >= 8
+
+    def is_valid_email(self, email):
+        """Validasi email menggunakan regex yang benar."""
+        return re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email) is not None
+
+    def get_current_user_id(self):
+        """Kembalikan user_id dari pengguna yang login."""
+        if self.current_user:
+            return self.current_user.get("user_id")
+        return None
+
+    def get_valid_url(self, url_type, current_url):
+        """Meminta input URL yang valid untuk Scopus, Sinta, atau Google Scholar."""
+        while True:
+            print(f"\nCurrent {url_type} URL: {current_url}")
+            new_url = input(f"Enter new {url_type} URL (or leave blank to keep current): ").strip()
+
+            # Jika pengguna tidak memasukkan URL, kembalikan URL saat ini
+            if not new_url:
+                return current_url
+
+            # Validasi URL
+            if not new_url.startswith(("http://", "https://")):
+                print(f"Invalid {url_type} URL. It must start with 'http://' or 'https://'.")
+                continue
+            if not new_url.endswith((".com", ".org", ".edu", ".gov", ".net", ".io", ".co.id")):
+                print(f"Invalid {url_type} URL. It must end with a valid domain (e.g., .com, .org, .edu).")
+                continue
+            if len(new_url) < 10:
+                print(f"Invalid {url_type} URL. It must be at least 10 characters long.")
+                continue
+            return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi   
+
+

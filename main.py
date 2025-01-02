@@ -8,7 +8,6 @@ import time
 
 def user_menu(auth, report_controller):
     while True:
-        clear_screen()
         user_id = auth.get_current_user_id()
 
         # Statistik + menu user
@@ -37,9 +36,7 @@ def user_menu(auth, report_controller):
 
 def validator_menu(auth, report_controller):
     validator_id = auth.current_user.get("validator_id") #ambil validator_id yang sedang login
-    while True:
-        clear_screen()  
-        
+    while True:        
         # statistik + menu validator
         report_controller.show_validator_statistics(validator_id)
         show_validator_menu()
@@ -54,17 +51,17 @@ def validator_menu(auth, report_controller):
             report_controller.list_accepted_reports(validator_id)
         elif choice == "3":
             print("Logging out...")
+            time.sleep(2)
             break
         else:
             print("Invalid choice. Please try again.")
             input("\nPress Enter to continue...")
 
 def admin_menu(auth):
-    """Menu untuk admin."""
     admin_controller = AdminController()  # AdminController init
     while True:
-        clear_screen()
         
+        clear_screen()
         # statistik + admin menu
         admin_controller.view_statistics()
         show_admin_menu()
@@ -85,6 +82,7 @@ def admin_menu(auth):
             input("\nPress Enter to return to the admin menu...")
         elif choice == "5":
             print("Logging out...")
+            time.sleep(2)
             break
         else:
             print("Invalid choice. Please try again.")
