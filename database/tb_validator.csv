@@ -1,4 +1,4 @@
 validator_id,username,password,full_name,email,instancy,academic_position,scopus_url,sinta_url,google_scholar_url,role
 1,validator1,securepass,Dr. Ahmad,test@gmail.com,ITB,Dosen,http://scopus.com,sinta.com,scholar.com,validator
 2,validator2,12345678,DR. Stark,stark@gmail.com,upi,dosen,sinta.com,sinta.com,sinta.com,validator
-3,validator_terbaru,passbaru,Kautsar,uwi@gmail.com,upi,mahasiswa s4,https://scopus.com,https://sinta.com,https://scholar.com,validator
+3,validator_terbaru,passlama,Kautsar,uwi@gmail.com,upi,mahasiswa s4,https://scopus.com,https://sinta.com,https://scholar.com,validator
