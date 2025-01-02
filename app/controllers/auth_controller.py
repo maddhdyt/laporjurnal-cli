@@ -2,6 +2,7 @@ from utils import clear_screen
 import pandas as pd
 from app.models.CSVModel import CSVModel
 import re
+import time
 
 class AuthController:
     def __init__(self):
@@ -26,6 +27,7 @@ class AuthController:
                     if user.iloc[0]["password"] == password:
                         self.current_user = user.iloc[0].to_dict()
                         print(f"Login successful! Welcome, {username} (User).")
+                        time.sleep(2)
                         return "user"
                     else:
                         print("Invalid password. Please try again.")
@@ -37,7 +39,8 @@ class AuthController:
                 if not validator.empty:
                     if validator.iloc[0]["password"] == password:
                         self.current_user = validator.iloc[0].to_dict()
-                        print(f"Login successful! Welcome, {username} (Validator).")
+                        print(f"Login successful! Welcome, {username} (Validator). Redirecting...")
+                        time.sleep(2)
                         return "validator"
                     else:
                         print("Invalid password. Please try again.")
@@ -50,6 +53,7 @@ class AuthController:
                     if admin.iloc[0]["password"] == password:
                         self.current_user = admin.iloc[0].to_dict()
                         print(f"Login successful! Welcome, {username} (Admin).")
+                        time.sleep(2)
                         return "admin"
                     else:
                         print("Invalid password. Please try again.")
