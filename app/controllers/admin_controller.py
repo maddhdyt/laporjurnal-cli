@@ -273,9 +273,11 @@ class AdminController:
 
                 if choice == "1":
                     self.edit_validator(validator_id)  # Panggil metode edit_validator
-
+                    return
+                    
                 elif choice == "2":
                     self.delete_validator(validator_id)  # Panggil metode delete_validator
+                    return
 
                 elif choice == "3":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
@@ -314,6 +316,7 @@ class AdminController:
                 break
 
             new_full_name = input(f"Enter new full name (current: {validator['full_name']}): ").strip()
+            
             # Validasi email baru
             while True:
                 new_email = input(f"Enter new email (current: {validator['email']}): ").strip()
@@ -329,9 +332,10 @@ class AdminController:
                     print("Password must be at least 8 characters.")
                 else:
                     break  # Keluar dari loop jika password valid
+                
             new_instancy = input(f"Enter new instancy (current: {validator['instancy']}): ").strip()
-
             new_academic_position = input(f"Enter new academic position (current: {validator['academic_position']}): ").strip()
+            
             # Opsi untuk mengedit URL (Scopus, Sinta, Google Scholar)
             while True:
                 print("\nDo you want to edit URLs?")
@@ -342,24 +346,18 @@ class AdminController:
                 url_choice = input("Choose an option: ").strip()
     
                 if url_choice == "1":
-                    new_scopus_url = self.get_valid_url("Scopus", validator["scopus_url"])
+                    new_scopus_url = self.auth_controller.get_valid_url("Scopus", validator["scopus_url"])
                     validator_data.loc[validator_data["validator_id"] == validator_id, "scopus_url"] = new_scopus_url
                 elif url_choice == "2":
-                    new_sinta_url = self.get_valid_url("Sinta", validator["sinta_url"])
+                    new_sinta_url = self.auth_controller.get_valid_url("Sinta", validator["sinta_url"])
                     validator_data.loc[validator_data["validator_id"] == validator_id, "sinta_url"] = new_sinta_url
                 elif url_choice == "3":
-                    new_google_scholar_url = self.get_valid_url("Google Scholar", validator["google_scholar_url"])
+                    new_google_scholar_url = self.auth_controller.get_valid_url("Google Scholar", validator["google_scholar_url"])
                     validator_data.loc[validator_data["validator_id"] == validator_id, "google_scholar_url"] = new_google_scholar_url
                 elif url_choice == "4":
                     break  # Keluar dari loop jika tidak ingin mengedit URL
                 else:
                     print("Invalid choice. Please try again.")
-    
-            # Simpan kembali ke file CSV
-            self.validator_model.write_data(validator_data)
-            print("Validator updated successfully.")
-        except Exception as e:
-            print(f"Error: {e}")
     
             # Update data validator
             validator_data.loc[validator_data["validator_id"] == validator_id, "username"] = new_username or validator["username"]
@@ -368,10 +366,45 @@ class AdminController:
             validator_data.loc[validator_data["validator_id"] == validator_id, "password"] = new_password or validator["password"]
             validator_data.loc[validator_data["validator_id"] == validator_id, "instancy"] = new_instancy or validator["instancy"]
             validator_data.loc[validator_data["validator_id"] == validator_id, "academic_position"] = new_academic_position or validator["academic_position"]
-
-            # Simpan kembali ke file CSV
+            
             self.validator_model.write_data(validator_data)
-            print("Validator updated successfully.")
+            print(f"Validator with ID {validator_id} has been updated successfully.")
+            
+            # Tampilkan validator details yang terbaru
+            validator_data = self.validator_model.read_data()
+            validator = validator_data[validator_data["validator_id"] == validator_id].iloc[0]
+
+            print("\n=== Validator Details ===")
+            print(f"Validator ID: {validator['validator_id']}")
+            print(f"Username: {validator['username']}")
+            print(f"Full Name: {validator['full_name']}")
+            print(f"Email: {validator['email']}")
+            print(f"Instancy: {validator['instancy']}")
+            print(f"Academic Position: {validator['academic_position']}")
+            print(f"Scopus URL: {validator['scopus_url']}")
+            print(f"Sinta URL: {validator['sinta_url']}")
+            print(f"Google Scholar URL: {validator['google_scholar_url']}")
+
+            # Opsi untuk mengedit atau menghapus validator
+            while True:
+                print("\nOptions:")
+                print("1. Edit Validator")
+                print("2. Delete Validator")
+                print("3. Return to Validator List")
+                choice = input("Choose an option: ").strip()
+                
+                if choice == "1":
+                    self.edit_validator(validator_id)  # Panggil metode edit_validator lagi
+                    break
+                elif choice == "2":
+                    self.delete_validator(validator_id)  # Panggil metode delete_validator
+                    break
+                elif choice == "3":
+                    self.view_all_validators()  # Kembali ke daftar validator
+                    break
+                else:
+                    print("Invalid choice. Please try again.")
+                
         except Exception as e:
             print(f"Error: {e}")
             
@@ -380,6 +413,7 @@ class AdminController:
             # Panggil metode delete_data dari validator_model
             self.validator_model.delete_data("validator_id", validator_id)
             print(f"Validator with ID {validator_id} has been deleted successfully.")
+            return
         except Exception as e:
             print(f"Error deleting validator: {e}")
 
@@ -390,21 +424,3 @@ class AdminController:
             print(f"User  with ID {user_id} has been deleted successfully.")
         except Exception as e:
             print(f"Error deleting user: {e}")
-            
-    # Validation Rule
-    def get_valid_url(self, url_type, current_url):
-        while True:
-            print(f"\nCurrent {url_type} URL: {current_url}")
-            new_url = input(f"Enter new {url_type} URL (or leave blank to keep current): ").strip()
-    
-            # Jika pengguna tidak memasukkan URL, kembalikan URL saat ini
-            if not new_url:
-                return current_url
-    
-            # Validasi URL
-            if not new_url.startswith("http"):
-                print(f"Invalid {url_type} URL. It must start with 'http' or 'https'.")
-            elif not "." in new_url:  # Minimal harus ada domain (contoh: example.com)
-                print(f"Invalid {url_type} URL. It must contain a valid domain.")
-            else:
-                return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi

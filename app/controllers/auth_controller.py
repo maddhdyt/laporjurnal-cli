@@ -170,29 +170,10 @@ class AuthController:
             else:
                 break
 
-        # Opsi untuk menginput URL (Scopus, Sinta, Google Scholar)
-        scopus_url = ""
-        sinta_url = ""
-        google_scholar_url = ""
-
-        while True:
-            print("\nDo you want to add URLs?")
-            print("1. Add Scopus URL")
-            print("2. Add Sinta URL")
-            print("3. Add Google Scholar URL")
-            print("4. Skip URL input")
-            url_choice = input("Choose an option: ").strip()
-
-            if url_choice == "1":
-                scopus_url = self.get_valid_url("Scopus", "")
-            elif url_choice == "2":
-                sinta_url = self.get_valid_url("Sinta", "")
-            elif url_choice == "3":
-                google_scholar_url = self.get_valid_url("Google Scholar", "")
-            elif url_choice == "4":
-                break  # Keluar dari loop jika tidak ingin menginput URL
-            else:
-                print("Invalid choice. Please try again.")
+        # Input URL (Scopus, Sinta, Google Scholar) dengan rule get_valid_url
+        scopus_url = self.get_valid_url("Scopus", "")
+        sinta_url = self.get_valid_url("Sinta", "")
+        google_scholar_url = self.get_valid_url("Google Scholar", "")
 
         # Tambahkan validator baru
         new_validator = {
@@ -323,25 +304,17 @@ class AuthController:
         return None
 
     def get_valid_url(self, url_type, current_url):
-        """Meminta input URL yang valid untuk Scopus, Sinta, atau Google Scholar."""
         while True:
-            print(f"\nCurrent {url_type} URL: {current_url}")
-            new_url = input(f"Enter new {url_type} URL (or leave blank to keep current): ").strip()
-
-            # Jika pengguna tidak memasukkan URL, kembalikan URL saat ini
-            if not new_url:
-                return current_url
-
+            print(f"\nEnter {url_type} URL (must start with 'http://' or 'https://', contain a valid domain, and be at least 10 characters long):")
+            new_url = input().strip()
+            
             # Validasi URL
             if not new_url.startswith(("http://", "https://")):
                 print(f"Invalid {url_type} URL. It must start with 'http://' or 'https://'.")
-                continue
-            if not new_url.endswith((".com", ".org", ".edu", ".gov", ".net", ".io", ".co.id")):
-                print(f"Invalid {url_type} URL. It must end with a valid domain (e.g., .com, .org, .edu).")
-                continue
-            if len(new_url) < 10:
+            elif not "." in new_url:  # Minimal harus ada domain (contoh: example.com)
+                print(f"Invalid {url_type} URL. It must contain a valid domain.")
+            elif len(new_url) < 10:
                 print(f"Invalid {url_type} URL. It must be at least 10 characters long.")
-                continue
-            return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi   
-
+            else:
+                return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi
 
