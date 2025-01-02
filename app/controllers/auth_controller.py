@@ -26,7 +26,7 @@ class AuthController:
                 if not user.empty:
                     if user.iloc[0]["password"] == password:
                         self.current_user = user.iloc[0].to_dict()
-                        print(f"Login successful! Welcome, {username} (User).")
+                        print(f"Login successful! Welcome, {username} (User). Redirecting...")
                         time.sleep(2)
                         return "user"
                     else:
@@ -52,7 +52,7 @@ class AuthController:
                 if not admin.empty:
                     if admin.iloc[0]["password"] == password:
                         self.current_user = admin.iloc[0].to_dict()
-                        print(f"Login successful! Welcome, {username} (Admin).")
+                        print(f"Login successful! Welcome, {username} (Admin). Redirecting...")
                         time.sleep(2)
                         return "admin"
                     else:
@@ -68,7 +68,6 @@ class AuthController:
         clear_screen()
         print("\n=== Register User ===")
 
-        # Validasi Username
         while True:
             username = input("Enter username: ").strip()
             if not self.is_valid_username(username):
@@ -97,6 +96,11 @@ class AuthController:
             email = input("Enter email: ").strip()
             if not self.is_valid_email(email):
                 print("Invalid email format. Please try again.")
+                continue
+            # Cek apakah email sudah digunakan oleh user lain
+            user_data = self.user_model.read_data()
+            if not user_data[user_data["email"] == email].empty:
+                print("Email already exists. Please choose another one.")
                 continue
             break
 
@@ -155,6 +159,11 @@ class AuthController:
             email = input("Enter email: ").strip()
             if not self.is_valid_email(email):
                 print("Invalid email format. Please try again.")
+                continue
+            # Cek apakah email sudah digunakan oleh user lain
+            validator_data = self.validator_model.read_data()
+            if not validator_data[validator_data["email"] == email].empty:
+                print("Email already exists. Please choose another one.")
                 continue
             break
 
