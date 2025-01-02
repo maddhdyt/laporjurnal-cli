@@ -1,4 +1,5 @@
 import pandas as pd
+from utils import clear_screen
 from app.models.CSVModel import CSVModel
 from app.controllers.auth_controller import AuthController
 from tabulate import tabulate
@@ -9,33 +10,55 @@ class AdminController:
         self.user_model = CSVModel("database/tb_user.csv")
         self.validator_model = CSVModel("database/tb_validator.csv")
         self.auth_controller = AuthController()
+        
+    def view_statistics(self):
+        try:
+            # Baca data dari file CSV
+            report_data = self.report_model.read_data()
+            user_data = self.user_model.read_data()
+            validator_data = self.validator_model.read_data()
+
+            # Hitung statistik
+            total_reports = len(report_data)  # Total Laporan
+            total_users = len(user_data)  # Jumlah User
+            total_validators = len(validator_data)  # Jumlah Validator
+            pending_reports = len(report_data[report_data["status_laporan"] == "pending"])  # Laporan Pending
+            review_reports = len(report_data[report_data["status_laporan"] == "review"])  # Laporan Review
+            done_reports = len(report_data[report_data["status_laporan"] == "done"])  # Laporan Sukses
+
+            # Tampilkan statistik dalam format yang rapi
+            print("=== Statistics ===")
+            print(f"Total Laporan: {total_reports}")
+            print(f"Jumlah User: {total_users}")
+            print(f"Jumlah Validator: {total_validators}")
+            print(f"Laporan Pending: {pending_reports}")
+            print(f"Laporan Review: {review_reports}")
+            print(f"Laporan Sukses: {done_reports}")
+        except Exception as e:
+            print(f"Error: {e}")   
 
     def view_all_reports(self):
-        """Menampilkan semua laporan dan memberikan opsi untuk melihat detail."""
-        while True:  # Loop utama untuk menampilkan tabel laporan
+        clear_screen()
+        while True:
             print("\n=== All Reports ===")
             try:
-                # Baca data laporan dari file CSV
                 report_data = self.report_model.read_data()
                 if report_data.empty:
                     print("No reports found.")
-                    return  # Kembali ke menu sebelumnya jika tidak ada laporan
+                    return  
                 else:
-                    # Tampilkan ringkasan laporan
                     display_data = report_data[["report_id", "journal_name", "journal_url", "status_laporan"]]
                     print(tabulate(display_data, headers="keys", tablefmt="fancy_grid"))
 
                     while True:
-                        # Meminta admin untuk memasukkan report_id untuk melihat detail atau kembali
                         report_id = input("\nEnter Report ID to view details or 0 to return: ").strip()
                         if report_id == "0":
-                            return  # Kembali ke menu sebelumnya
+                            return
                         elif report_id.isdigit():
                             report_id = int(report_id)
                             if report_id in report_data["report_id"].values:
-                                # Tampilkan detail laporan
                                 self.view_report_details(report_id)
-                                break  # Keluar dari loop setelah kembali dari detail laporan
+                                break 
                             else:
                                 print("Report ID not found. Please try again.")
                         else:
@@ -44,7 +67,6 @@ class AdminController:
                 print(f"Error: {e}")
 
     def view_report_details(self, report_id):
-        """Menampilkan detail laporan sesuai template yang diminta."""
         try:
             # Baca data laporan
             report_data = self.report_model.read_data()
@@ -108,7 +130,7 @@ class AdminController:
             print(f"Error: {e}")
 
     def view_all_users(self):
-        """Menampilkan semua akun user dan memberikan opsi untuk melihat detail atau menghapus."""
+        clear_screen()
         print("\n=== All Users ===")
         try:
             user_data = self.user_model.read_data()
@@ -143,7 +165,7 @@ class AdminController:
             print(f"Error: {e}")
 
     def view_user_details(self, user_id):
-        """Menampilkan detail pengguna dan memberikan opsi untuk menghapus."""
+        clear_screen()
         try:
             user_data = self.user_model.read_data()
             user = user_data[user_data["user_id"] == user_id]
@@ -185,7 +207,7 @@ class AdminController:
             print(f"Error: {e}")
 
     def view_all_validators(self):
-        """Menampilkan semua akun validator dan memberikan opsi untuk menghapus."""
+        clear_screen()
         print("\n=== All Validators ===")
         try:
             validator_data = self.validator_model.read_data()
@@ -220,7 +242,6 @@ class AdminController:
             print(f"Error: {e}")
 
     def view_validator_details(self, validator_id):
-        """Menampilkan detail validator dan memberikan opsi untuk mengedit atau menghapus."""
         try:
             validator_data = self.validator_model.read_data()
             validator = validator_data[validator_data["validator_id"] == validator_id]
@@ -266,7 +287,6 @@ class AdminController:
             print(f"Error: {e}")
             
     def edit_validator(self, validator_id):
-        """Mengedit data validator berdasarkan Validator ID."""
         try:
             # Baca data validator dari file CSV
             validator_data = self.validator_model.read_data()
@@ -354,9 +374,25 @@ class AdminController:
             print("Validator updated successfully.")
         except Exception as e:
             print(f"Error: {e}")
+            
+    def delete_validator(self, validator_id):
+        try:
+            # Panggil metode delete_data dari validator_model
+            self.validator_model.delete_data("validator_id", validator_id)
+            print(f"Validator with ID {validator_id} has been deleted successfully.")
+        except Exception as e:
+            print(f"Error deleting validator: {e}")
 
+    def delete_user(self, user_id):
+        try:
+            # Panggil metode delete_data dari user_model
+            self.user_model.delete_data("user_id", user_id)
+            print(f"User  with ID {user_id} has been deleted successfully.")
+        except Exception as e:
+            print(f"Error deleting user: {e}")
+            
+    # Validation Rule
     def get_valid_url(self, url_type, current_url):
-        """Meminta input URL yang valid untuk Scopus, Sinta, atau Google Scholar."""
         while True:
             print(f"\nCurrent {url_type} URL: {current_url}")
             new_url = input(f"Enter new {url_type} URL (or leave blank to keep current): ").strip()
@@ -372,49 +408,3 @@ class AdminController:
                 print(f"Invalid {url_type} URL. It must contain a valid domain.")
             else:
                 return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi
-
-
-    def delete_validator(self, validator_id):
-        """Menghapus akun validator berdasarkan Validator ID."""
-        try:
-            # Panggil metode delete_data dari validator_model
-            self.validator_model.delete_data("validator_id", validator_id)
-            print(f"Validator with ID {validator_id} has been deleted successfully.")
-        except Exception as e:
-            print(f"Error deleting validator: {e}")
-
-    def delete_user(self, user_id):
-        """Menghapus akun pengguna berdasarkan User ID."""
-        try:
-            # Panggil metode delete_data dari user_model
-            self.user_model.delete_data("user_id", user_id)
-            print(f"User  with ID {user_id} has been deleted successfully.")
-        except Exception as e:
-            print(f"Error deleting user: {e}")
-            
-    def view_statistics(self):
-        """Menampilkan statistik/jumlah data."""
-        try:
-            # Baca data dari file CSV
-            report_data = self.report_model.read_data()
-            user_data = self.user_model.read_data()
-            validator_data = self.validator_model.read_data()
-
-            # Hitung statistik
-            total_reports = len(report_data)  # Total Laporan
-            total_users = len(user_data)  # Jumlah User
-            total_validators = len(validator_data)  # Jumlah Validator
-            pending_reports = len(report_data[report_data["status_laporan"] == "pending"])  # Laporan Pending
-            review_reports = len(report_data[report_data["status_laporan"] == "review"])  # Laporan Review
-            done_reports = len(report_data[report_data["status_laporan"] == "done"])  # Laporan Sukses
-
-            # Tampilkan statistik dalam format yang rapi
-            print("=== Statistics ===")
-            print(f"Total Laporan: {total_reports}")
-            print(f"Jumlah User: {total_users}")
-            print(f"Jumlah Validator: {total_validators}")
-            print(f"Laporan Pending: {pending_reports}")
-            print(f"Laporan Review: {review_reports}")
-            print(f"Laporan Sukses: {done_reports}")
-        except Exception as e:
-            print(f"Error: {e}")
