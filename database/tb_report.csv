@@ -9,3 +9,4 @@ report_id,user_id,full_name,is_anonymous,journal_name,journal_url,reason,status_
 8,3,ahmad hidayat,False,jurnalinformatika,https://jurnalinformatika.com,testing all,done,2025-01-01 17:32:03,1.0,aman,JURNAL INI DAPAT DIPERCAYA
 10,1,John Doe,False,Jurnal Predator,https://jurnalpredator.com,"mencurigakan, mencakup terlalu banyak bidang, link",done,2025-01-03 07:28:44,1.0,clone,JURNAL INI CLONINGAN JURNAL RPL
 11,1,Anonymous,True,TEST,https://jurnal123.com,asdasd,done,2025-01-03 07:31:42,1.0,predator,JURNAL INI PREDATOR
+12,2,Anonymous,True,askdasdkaskd,http://asdkaskdas.com,adsasdkaskdk,done,2025-01-03 17:38:59,1.0,aman,sdkaskdaskdkas

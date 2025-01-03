@@ -17,7 +17,7 @@ class CSVModel:
         try:
             data.to_csv(self.file_path, index=False)
         except Exception as e:
-            print(f"Error writing data to {self.file_path}: {e}")
+            print(f"Kesalahan penulisan data ke {self.file_path}: {e}")
         
     def delete_data(self, column, value):
         """Menghapus data dari file CSV berdasarkan kolom dan nilai."""
@@ -31,4 +31,4 @@ class CSVModel:
             # Simpan kembali data yang sudah dihapus ke file CSV
             self.write_data(data)
         except Exception as e:
-            print(f"Error deleting data: {e}")
+            print(f"Kesalahan penghapusan data: {e}")

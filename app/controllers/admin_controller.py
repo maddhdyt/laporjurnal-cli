@@ -24,10 +24,10 @@ class AdminController:
             total_validators = len(validator_data)  # Jumlah Validator
             pending_reports = len(report_data[report_data["status_laporan"] == "pending"])  # Laporan Pending
             review_reports = len(report_data[report_data["status_laporan"] == "review"])  # Laporan Review
-            done_reports = len(report_data[report_data["status_laporan"] == "done"])  # Laporan Sukses
+            done_reports = len(report_data[report_data["status_laporan"] == "sukses"])  # Laporan Sukses
 
             # Tampilkan statistik dalam format yang rapi
-            print("=== Statistics ===")
+            print("=== Statistik ===")
             print(f"Total Laporan: {total_reports}")
             print(f"Jumlah User: {total_users}")
             print(f"Jumlah Validator: {total_validators}")
@@ -40,18 +40,18 @@ class AdminController:
     def view_all_reports(self):
         clear_screen()
         while True:
-            print("\n=== All Reports ===")
+            print("\n=== Semua Laporan ===")
             try:
                 report_data = self.report_model.read_data()
                 if report_data.empty:
-                    print("No reports found.")
+                    print("Tidak ada laporan yang ditemukan.")
                     return  
                 else:
                     display_data = report_data[["report_id", "journal_name", "journal_url", "status_laporan"]]
                     print(tabulate(display_data, headers="keys", tablefmt="fancy_grid"))
 
                     while True:
-                        report_id = input("\nEnter Report ID to view details or 0 to return: ").strip()
+                        report_id = input("\nMasukkan ID Laporan untuk melihat detail atau 0 untuk kembali: ").strip()
                         if report_id == "0":
                             return
                         elif report_id.isdigit():
@@ -60,9 +60,9 @@ class AdminController:
                                 self.view_report_details(report_id)
                                 break 
                             else:
-                                print("Report ID not found. Please try again.")
+                                print("ID laporan tidak ditemukan. Silakan coba lagi.")
                         else:
-                            print("Invalid input. Please enter a valid Report ID or 0 to return.")
+                            print("Masukan tidak valid. Masukkan ID Laporan yang valid atau 0 untuk kembali.")
             except Exception as e:
                 print(f"Error: {e}")
 
@@ -73,7 +73,7 @@ class AdminController:
             report = report_data[report_data["report_id"] == report_id]
     
             if report.empty:
-                print("Report not found.")
+                print("Laporan tidak ditemukan.")
                 return
     
             # Ambil informasi laporan
@@ -88,14 +88,14 @@ class AdminController:
             validator = validator_data[validator_data["validator_id"] == report["validator_id"]]
     
             # Tampilkan detail laporan
-            print("\n=== Report Details ===")
-            print(f"Report ID: {report['report_id']}")
-            print(f"Date Submitted: {report['tanggal_laporan']}")
-            print(f"Journal Name: {report['journal_name']}")
-            print(f"Journal URL: {report['journal_url']}")
+            print("\n=== Rincian Laporan ===")
+            print(f"ID Laporan: {report['report_id']}")
+            print(f"Tanggal Dikirim: {report['tanggal_laporan']}")
+            print(f"Nama Jurnal: {report['journal_name']}")
+            print(f"URL Jurnal: {report['journal_url']}")
             print(f"Nama Pelapor: {user.iloc[0]['full_name'] if not user.empty else 'N/A'}")
             print(f"Instansi Pelapor: {user.iloc[0]['instancy'] if not user.empty else 'N/A'}")
-            print(f"Reason: {report['reason']}")
+            print(f"Alasan: {report['reason']}")
     
             # Tampilkan hasil review (jika ada)
             print("\n=== Review Result ===")
@@ -103,7 +103,7 @@ class AdminController:
                 validator = validator.iloc[0]  # Ambil baris pertama
                 print(f"Nama Validator: {validator['full_name']}")
                 print(f"Instansi Validator: {validator['instancy']}")
-                print("Profile Validator:")
+                print("Profil Validator:")
                 if pd.notna(validator['scopus_url']):
                     print(f"- {validator['scopus_url']}")
                 if pd.notna(validator['sinta_url']):
@@ -113,29 +113,29 @@ class AdminController:
             else:
                 print("Nama Validator: N/A")
                 print("Instansi Validator: N/A")
-                print("Profile Validator: N/A")
+                print("Profil Validator: N/A")
     
             print(f"Status Laporan: {report['status_laporan']}")
             print(f"Status Jurnal: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
-            print(f"Feedback: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
+            print(f"Umpan Balik: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
             
             # Opsi untuk kembali ke daftar laporan
             while True:
-                choice = input("\nPress 0 to return to the report list: ").strip()
+                choice = input("\nTekan 0 untuk kembali ke daftar laporan: ").strip()
                 if choice == "0":
                     return  # Kembali ke daftar laporan
                 else:
-                    print("Invalid input. Please press 0 to return.")
+                    print("Input tidak valid. Silakan tekan 0 untuk kembali.")
         except Exception as e:
             print(f"Error: {e}")
 
     def view_all_users(self):
         clear_screen()
-        print("\n=== All Users ===")
+        print("\n=== Semua Pengguna ===")
         try:
             user_data = self.user_model.read_data()
             if user_data.empty:
-                print("No users found.")
+                print("Tidak ada pengguna yang ditemukan.")
                 return  # Kembali ke menu sebelumnya jika tidak ada data user
             else:
                 # Tampilkan hanya kolom user_id, full_name, dan instancy
@@ -144,11 +144,11 @@ class AdminController:
 
                 while True:
                     # Meminta admin untuk memasukkan user_id untuk melihat detail atau menghapus
-                    user_id = input("\nEnter User ID to view details, delete, or 0 to return: ").strip()
+                    user_id = input("\nMasukkan ID Pengguna untuk melihat detail, hapus, atau 0 untuk kembali: ").strip()
 
                     # Validasi input: harus berupa angka
                     if not user_id.isdigit():
-                        print("Invalid input. Please enter a valid User ID (number) or 0 to return.")
+                        print("Masukan tidak valid. Masukkan ID Pengguna (angka) yang valid atau 0 untuk kembali.")
                         continue  # Lanjutkan loop untuk meminta input lagi
 
                     user_id = int(user_id)  # Konversi input ke integer
@@ -160,7 +160,7 @@ class AdminController:
                         self.view_user_details(user_id)
                         break  # Keluar dari loop setelah kembali dari view_user_details
                     else:
-                        print("User  ID not found. Please try again.")
+                        print("ID pengguna tidak ditemukan. Silakan coba lagi.")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -171,26 +171,26 @@ class AdminController:
             user = user_data[user_data["user_id"] == user_id]
 
             if user.empty:
-                print("User  not found.")
+                print("Pengguna tidak ditemukan.")
                 return
 
             # Ambil informasi pengguna
             user = user.iloc[0]  # Ambil baris pertama
-            print("\n=== User Details ===")
-            print(f"User  ID: {user['user_id']}")
+            print("\n=== Detail Pengguna ===")
+            print(f"ID Pengguna: {user['user_id']}")
             print(f"Username: {user['username']}")
-            print(f"Full Name: {user['full_name']}")
+            print(f"Nama Lengkap: {user['full_name']}")
             print(f"Email: {user['email']}")
             print(f"Password: {user['password']}")
-            print(f"Instancy: {user['instancy']}")
-            print(f"Role: {user['role']}")
+            print(f"Instansi: {user['instancy']}")
+            print(f"Peran: {user['role']}")
 
             # Loop untuk memastikan input yang valid
             while True:
-                print("\nOptions:")
-                print("1. Delete User")
-                print("2. Return to User List")
-                choice = input("Choose an option: ").strip()
+                print("\nOpsi:")
+                print("1. Hapus Pengguna")
+                print("2. Kembali ke Daftar Pengguna")
+                choice = input("Pilih opsi: ").strip()
 
                 if choice == "1":
                     self.delete_user(user_id)
@@ -200,7 +200,7 @@ class AdminController:
                     self.view_all_users()
                     return  # Kembali ke menu admin setelah menampilkan tabel
                 else:
-                    print("Invalid choice. Please try again.")
+                    print("Pilihan tidak valid. Silakan coba lagi.")
                     # Loop akan berlanjut hingga input yang valid diberikan
 
         except Exception as e:
@@ -208,11 +208,11 @@ class AdminController:
 
     def view_all_validators(self):
         clear_screen()
-        print("\n=== All Validators ===")
+        print("\n=== Semua Validator ===")
         try:
             validator_data = self.validator_model.read_data()
             if validator_data.empty:
-                print("No validators found.")
+                print("Tidak ada validator yang ditemukan.")
                 return  # Kembali ke menu sebelumnya jika tidak ada data validator
             else:
                 # Tampilkan hanya kolom validator_id, full_name, dan instancy
@@ -221,11 +221,11 @@ class AdminController:
 
                 while True:
                     # Meminta admin untuk memasukkan validator_id untuk melihat detail atau menghapus
-                    validator_id = input("\nEnter Validator ID to view details, delete, or 0 to return: ").strip()
+                    validator_id = input("\nMasukkan ID Validator untuk melihat detail, hapus, atau 0 untuk kembali: ").strip()
 
                     # Validasi input: harus berupa angka
                     if not validator_id.isdigit():
-                        print("Invalid input. Please enter a valid Validator ID (number) or 0 to return.")
+                        print("Masukan tidak valid. Masukkan ID Validator (angka) yang valid atau 0 untuk kembali.")
                         continue  # Lanjutkan loop untuk meminta input lagi
 
                     validator_id = int(validator_id)  # Konversi input ke integer
@@ -237,7 +237,7 @@ class AdminController:
                         self.view_validator_details(validator_id)
                         break  # Keluar dari loop setelah kembali dari view_validator_details
                     else:
-                        print("Validator ID not found. Please try again.")
+                        print("ID validator tidak ditemukan. Silakan coba lagi.")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -247,31 +247,31 @@ class AdminController:
             validator = validator_data[validator_data["validator_id"] == validator_id]
 
             if validator.empty:
-                print("Validator not found.")
+                print("Pilihan tidak valid. Silakan coba lagi.")
                 return
 
             # Ambil informasi validator
             validator = validator.iloc[0]  # Ambil baris pertama
-            print("\n=== Validator Details ===")
-            print(f"Validator ID: {validator['validator_id']}")
+            print("\n=== Detail Validator ===")
+            print(f"ID Validator: {validator['validator_id']}")
             print(f"Username: {validator['username']}")
-            print(f"Full Name: {validator['full_name']}")
+            print(f"Nama Lengkap: {validator['full_name']}")
             print(f"Email: {validator['email']}")
             print(f"Password: {validator['password']}")
-            print(f"Instancy: {validator['instancy']}")
-            print(f"Academic Position: {validator['academic_position']}")
+            print(f"Instansi: {validator['instancy']}")
+            print(f"Posisi Akademik: {validator['academic_position']}")
             print(f"Scopus URL: {validator['scopus_url']}")
             print(f"Sinta URL: {validator['sinta_url']}")
             print(f"Google Scholar URL: {validator['google_scholar_url']}")
 
             # Opsi untuk mengedit atau menghapus validator
             while True:
-                print("\nOptions:")
-                print("1. Edit Information Validator")
+                print("\nOpsi:")
+                print("1. Edit Informasi Validator")
                 print("2. Edit Password Validator")
-                print("3. Delete Validator")
-                print("3. Return to Validator List")
-                choice = input("Choose an option: ").strip()
+                print("3. Hapus Validator")
+                print("4. Kembali ke Daftar Validator")
+                choice = input("Pilih opsi: ").strip()
 
                 if choice == "1":
                     self.edit_validator_information(validator_id)  # Panggil metode edit_validator_information
@@ -283,12 +283,13 @@ class AdminController:
                 
                 elif choice == "3":
                     self.delete_validator(validator_id)  # Panggil metode delete_validator
-
+                    return
+                
                 elif choice == "4":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
                     return  # Kembali ke menu admin setelah menampilkan tabel
                 else:
-                    print("Invalid choice. Please try again.")
+                    print("Pilihan tidak valid. Silakan coba lagi.")
                     continue
         except Exception as e:
             print(f"Error: {e}")
@@ -300,47 +301,53 @@ class AdminController:
             validator = validator_data[validator_data["validator_id"] == validator_id]
 
             if validator.empty:
-                print("Validator not found.")
+                print("Pilihan tidak valid. Silakan coba lagi.")
                 return
 
             # Ambil informasi validator
             validator = validator.iloc[0]  # Ambil baris pertama
             print("\n=== Edit Validator ===")
-            print(f"Validator ID: {validator['validator_id']} (Cannot be changed)")
+            print(f"ID Validator: {validator['validator_id']} (Tidak dapat diubah)")
 
             # Input untuk mengedit data
             while True:
-                new_username = input(f"Enter new username (current: {validator['username']}): ").strip()
+                new_username = input(f"Masukkan username baru (Saat ini: {validator['username']}): ").strip()
                 if new_username:
                     if not self.auth_controller.is_valid_username(new_username):
-                        print("Invalid username. Username must be at least 8 characters and can only contain letters, numbers, '_', and '.'.")
+                        print("Username tidak valid. Username harus terdiri dari minimal 8 karakter dan hanya boleh terdiri dari huruf, angka, '_', dan '.'")
                         continue
                     if new_username != validator["username"] and new_username in validator_data["username"].values:
-                        print("Username already exists. Please choose another one.")
+                        print("Username sudah digunakan. Silakan coba lagi.")
                         continue
                 break
 
-            new_full_name = input(f"Enter new full name (current: {validator['full_name']}): ").strip()
+            new_full_name = input(f"Masukkan nama lengkap baru (Saat ini: {validator['full_name']}): ").strip()
             
             # Validasi email baru
+            # Validasi email baru
             while True:
-                new_email = input(f"Enter new email (current: {validator['email']}): ").strip()
-                if not self.auth_controller.is_valid_email(new_email):  # Panggil fungsi validasi email
-                    print("Invalid email format. Please enter a valid email address (e.g., example@domain.com).")
+                new_email = input(f"Masukkan email baru (Saat ini: {validator['email']}): ").strip()
+                if new_email:
+                    if not self.auth_controller.is_valid_email(new_email):  # Panggil fungsi validasi email
+                        print("Format email tidak valid. Masukkan alamat email yang valid (misalnya, example@domain.com).")
+                    elif new_email != validator["email"] and new_email in validator_data["email"].values:
+                        print("Email sudah digunakan. Silakan pilih email lain.")
+                    else:
+                        break  # Keluar dari loop jika email valid
                 else:
-                    break  # Keluar dari loop jika email valid
+                    break  # Keluar dari loop jika pengguna tidak memasukkan email baru
                 
-            new_instancy = input(f"Enter new instancy (current: {validator['instancy']}): ").strip()
-            new_academic_position = input(f"Enter new academic position (current: {validator['academic_position']}): ").strip()
+            new_instancy = input(f"Masukkan instansi baru (Saat ini: {validator['instancy']}): ").strip()
+            new_academic_position = input(f"Masukkan posisi akademik baru (Saat ini: {validator['academic_position']}): ").strip()
             
             # Opsi untuk mengedit URL (Scopus, Sinta, Google Scholar)
             while True:
-                print("\nDo you want to edit URLs?")
+                print("\nOpsi untuk mengedit URL:")
                 print("1. Edit Scopus URL")
                 print("2. Edit Sinta URL")
                 print("3. Edit Google Scholar URL")
-                print("4. Skip URL editing")
-                url_choice = input("Choose an option: ").strip()
+                print("4. Lewati pengeditan URL")
+                url_choice = input("Pilih opsi: ").strip()
     
                 if url_choice == "1":
                     new_scopus_url = self.auth_controller.get_valid_url("Scopus", validator["scopus_url"])
@@ -354,7 +361,7 @@ class AdminController:
                 elif url_choice == "4":
                     break  # Keluar dari loop jika tidak ingin mengedit URL
                 else:
-                    print("Invalid choice. Please try again.")
+                    print("Pilihan tidak valid, silakan coba lagi.")
     
             # Update data validator
             validator_data.loc[validator_data["validator_id"] == validator_id, "username"] = new_username or validator["username"]
@@ -369,27 +376,27 @@ class AdminController:
             validator_data = self.validator_model.read_data()
             validator = validator_data[validator_data["validator_id"] == validator_id].iloc[0]
 
-            print("\n=== Validator Details ===")
-            print(f"Validator ID: {validator['validator_id']}")
+            print("\n=== Detail Validator ===")
+            print(f"ID Validator: {validator['validator_id']}")
             print(f"Username: {validator['username']}")
-            print(f"Full Name: {validator['full_name']}")
+            print(f"Nama Lengkap: {validator['full_name']}")
             print(f"Email: {validator['email']}")
             print(f"Password: {validator['password']}")
-            print(f"Instancy: {validator['instancy']}")
-            print(f"Academic Position: {validator['academic_position']}")
+            print(f"Instansi: {validator['instancy']}")
+            print(f"Posisi Akademik: {validator['academic_position']}")
             print(f"Scopus URL: {validator['scopus_url']}")
             print(f"Sinta URL: {validator['sinta_url']}")
             print(f"Google Scholar URL: {validator['google_scholar_url']}")
 
             # Opsi untuk mengedit atau menghapus validator
-            print(f"===" + "Validator information has been updated successfully" + "===")
+            print(f"===" + "Informasi Validator Berhasil Diubah" + "===")
             while True:
-                print("\nOptions:")
-                print("1. Edit Information Validator")
+                print("\nOpsi:")
+                print("1. Edit Informasi Validator")
                 print("2. Edit Password Validator")
-                print("3. Delete Validator")
-                print("4. Return to Validator List")
-                choice = input("Choose an option: ").strip()
+                print("3. Hapus Validator")
+                print("4. Kembali ke Daftar Validator")
+                choice = input("Pilih opsi: ").strip()
 
                 if choice == "1":
                     self.edit_validator_information(validator_id)  # Panggil metode edit_validator_information
@@ -400,13 +407,14 @@ class AdminController:
                     return
                 
                 elif choice == "3":
-                    self.delete_validator(validator_id)  # Panggil metode delete_validator
+                    self.delete_validator(validator_id) # Panggil metode delete_validator
+                    return
 
                 elif choice == "4":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
                     return  # Kembali ke menu admin setelah menampilkan tabel
                 else:
-                    print("Invalid choice. Please try again.")
+                    print("Pilihan tidak valid, silakan coba lagi.")
                     continue
         except Exception as e:
             print(f"Error: {e}")
@@ -418,19 +426,27 @@ class AdminController:
             validator = validator_data[validator_data["validator_id"] == validator_id]
 
             if validator.empty:
-                print("Validator not found.")
+                print("Validator tidak ditemukan.")
                 return
 
             # Ambil informasi validator
             validator = validator.iloc[0]  # Ambil baris pertama
             print("\n=== Edit Validator Password ===")
 
+            # Minta password yang sekarang
             while True:
-                new_password = input("Enter new password: ").strip()
+                current_password = input("Masukkan password yang sekarang: ").strip()
+                if current_password == validator["password"]:
+                    break
+                else:
+                    print("Password yang sekarang tidak benar. Silakan coba lagi.")
+            
+            while True:
+                new_password = input("Masukkan password baru: ").strip()
                 if self.auth_controller.is_valid_password(new_password):
                     break
                 else:
-                    print("Invalid password. Password must be at least 8 characters long and contain a mix of letters, numbers, and special characters.")
+                    print("Password tidak valid. Password harus terdiri dari minimal 8 karakter dan berisi campuran huruf, angka, dan karakter khusus.")
 
             # Update password
             validator_data.loc[validator_data["validator_id"] == validator_id, "password"] = new_password
@@ -442,27 +458,27 @@ class AdminController:
             validator_data = self.validator_model.read_data()
             validator = validator_data[validator_data["validator_id"] == validator_id].iloc[0]
 
-            print("\n=== Validator Details ===")
-            print(f"Validator ID: {validator['validator_id']}")
+            print("\n=== Detail Validator ===")
+            print(f"ID Validator: {validator['validator_id']}")
             print(f"Username: {validator['username']}")
-            print(f"Full Name: {validator['full_name']}")
+            print(f"Nama Lengkap: {validator['full_name']}")
             print(f"Email: {validator['email']}")
             print(f"Password: {validator['password']}")
-            print(f"Instancy: {validator['instancy']}")
-            print(f"Academic Position: {validator['academic_position']}")
+            print(f"Instansi: {validator['instancy']}")
+            print(f"Posisi Akademik: {validator['academic_position']}")
             print(f"Scopus URL: {validator['scopus_url']}")
             print(f"Sinta URL: {validator['sinta_url']}")
             print(f"Google Scholar URL: {validator['google_scholar_url']}")
 
             # Opsi untuk mengedit atau menghapus validator
-            print("===" + "Validator password updated successfully" + "===")
+            print("===" + "Password Validator Berhasil Diubah" + "===")
             while True:
-                print("\nOptions:")
-                print("1. Edit Information Validator")
+                print("\nOpsi:")
+                print("1. Edit Informasi Validator")
                 print("2. Edit Password Validator")
-                print("3. Delete Validator")
-                print("4. Return to Validator List")
-                choice = input("Choose an option: ").strip()
+                print("3. Hapus Validator")
+                print("4. Kembali ke Daftar Validator")
+                choice = input("Pilih opsi: ").strip()
 
                 if choice == "1":
                     self.edit_validator_information(validator_id)  # Panggil metode edit_validator_information
@@ -474,12 +490,13 @@ class AdminController:
                 
                 elif choice == "3":
                     self.delete_validator(validator_id)  # Panggil metode delete_validator
+                    return
 
                 elif choice == "4":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
                     return  # Kembali ke menu admin setelah menampilkan tabel
                 else:
-                    print("Invalid choice. Please try again.")
+                    print("Pilihan tidak valid, silakan coba lagi.")
                     continue
         except Exception as e:
             print(f"Error: {e}")            
@@ -489,15 +506,14 @@ class AdminController:
         try:
             # Panggil metode delete_data dari validator_model
             self.validator_model.delete_data("validator_id", validator_id)
-            print(f"Validator with ID {validator_id} has been deleted successfully.")
-            return
+            print(f"Validator dengan ID {validator_id} berhasil dihapus.")
         except Exception as e:
-            print(f"Error deleting validator: {e}")
+            print(f"Error: {e}")
 
     def delete_user(self, user_id):
         try:
             # Panggil metode delete_data dari user_model
             self.user_model.delete_data("user_id", user_id)
-            print(f"User  with ID {user_id} has been deleted successfully.")
+            print(f"Pengguna dengan ID {user_id} berhasil dihapus.")
         except Exception as e:
-            print(f"Error deleting user: {e}")
+            print(f"Error: {e}")

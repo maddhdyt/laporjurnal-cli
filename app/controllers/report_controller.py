@@ -12,10 +12,10 @@ class ReportController:
 
     def report_journal(self, user_id, full_name):
         clear_screen()
-        print("\n=== Report Journal ===")
+        print("\n=== Laporan Jurnal ===")
 
         while True:
-            is_anonymous_input = input("Do you want to report as anonymous? (Y/N): ").strip().lower()
+            is_anonymous_input = input("Apakah anda ingin melaporkan secara anonim? (Y/N): ").strip().lower()
             if is_anonymous_input == "y":
                 is_anonymous = True
                 reporter_name = "Anonymous"
@@ -25,31 +25,31 @@ class ReportController:
                 reporter_name = full_name
                 break
             else:
-                print("Invalid choice. Please enter Y or N.")
+                print("Pilihan tidak valid. Silakan masukkan Y atau N.")
 
         # Input nama jurnal (tidak boleh kosong)
         while True:
-            journal_name = input("Enter journal name: ").strip()
+            journal_name = input("Masukkan nama jurnal: ").strip()
             if journal_name:  # Validasi: nama jurnal tidak boleh kosong
                 break
             else:
-                print("Journal name cannot be empty. Please try again.")
+                print("Nama jurnal tidak boleh kosong. Silakan coba lagi.")
 
         # Input URL jurnal (harus dimulai dengan 'http')
         while True:
-            journal_url = input("Enter journal URL: ").strip()
+            journal_url = input("Masukkan URL jurnal: ").strip()
             if self.is_valid_url(journal_url):
                 break
             else:
-                print("Invalid URL. Please enter a valid URL starting with 'http://' or 'https://', containing a domain, and without spaces.")
+                print("URL tidak valid. Silakan masukkan URL yang valid dimulai dengan 'http://' atau 'https://', mengandung domain, dan tanpa spasi.")
 
         # Input alasan laporan (tidak boleh kosong)
         while True:
-            reason = input("Enter your reason for reporting: ").strip()
+            reason = input("Masukkan alasan pelaporan Anda: ").strip()
             if reason:  # Validasi: alasan tidak boleh kosong
                 break
             else:
-                print("Reason cannot be empty. Please try again.")
+                print("Alasan tidak boleh kosong. Silakan coba lagi.")
 
         # Baca file CSV
         try:
@@ -82,22 +82,22 @@ class ReportController:
         report_data.to_csv(self.report_file, index=False)
 
         # Tampilkan laporan tanpa kolom is_anonymous
-        print("\nReport submitted successfully!")
-        print("\n=== Submitted Report ===")
+        print("\nLaporan berhasil dikirim!")
+        print("\n=== Laporan Yang Telah Dikirim ===")
         display_report = {key: value for key, value in new_report.items() if key != "is_anonymous"}  # Exclude is_anonymous
         print(tabulate([display_report.values()], headers=display_report.keys(), tablefmt="grid"))
 
     def track_reports(self, user_id):
         clear_screen()
         while True:
-            print("\n=== Tracking Reports ===")
+            print("\n=== Pelacakan Laporan ===")
             try:
                 report_data = pd.read_csv(self.report_file)
 
                 user_reports = report_data[report_data["user_id"] == user_id]
 
                 if user_reports.empty:
-                    print("You have no reports to track.")
+                    print("Anda tidak memiliki laporan untuk dilacak.")
                     return 
                 
                 display_data = user_reports[[
@@ -105,14 +105,14 @@ class ReportController:
                 ]]
                 print(tabulate(display_data, headers="keys", tablefmt="grid"))
 
-                report_id = input("\nEnter Report ID to view details or 0 to return: ").strip()
+                report_id = input("\nMasukkan ID Laporan untuk melihat detail atau 0 untuk kembali: ").strip()
                 if report_id == "0":
                     return  
 
                 try:
                     report_id = int(report_id)
                 except ValueError:
-                    print("Invalid Report ID. Please try again.")
+                    print("ID Laporan Tidak Valid. Silakan coba lagi.")
                     continue 
 
                 if report_id in user_reports["report_id"].values:
@@ -121,39 +121,39 @@ class ReportController:
                     self.view_report_details(selected_report)
                     
                     if selected_report["status_laporan"] == "pending":
-                        edit_choice = input("\nPress 1 to edit this report or 0 to return to the Tracking Reports: ").strip()
+                        edit_choice = input("\nTekan 1 untuk mengedit laporan ini atau 0 untuk kembali ke Pelacakan Laporan: ").strip()
                         if edit_choice == '1':
                             self.edit_report(selected_report)
                         elif edit_choice == '0':
                             continue  # Directly continue to the next iteration of the loop
                         else:
-                            print("Invalid choice. Returning to Tracking Reports...")
+                            print("Pilihan tidak valid. Kembali ke Pelacakan Laporan...")
                     else:
-                        print("\nThis report cannot be edited as it is not pending.")
-                        input("\nPress Enter to return to the Tracking Reports...")
+                        print("\nLaporan ini tidak dapat diedit karena statusnya bukan pending")
+                        input("\nTekan Enter untuk kembali ke Pelacakan Laporan...")
                         clear_screen()
 
                 else:
-                    print("Invalid Report ID. Please try again.")
+                    print("ID Laporan Tidak Valid. Silakan coba lagi.")
 
             except FileNotFoundError:
-                print("No report data file found.")
+                print("Tidak ada file yang ditemukan.")
                 return
             except Exception as e:
                 print(f"Error: {e}")
 
     def view_report_details(self, report):
         clear_screen()
-        print("\n=== Report Details ===")
+        print("\n=== Detail Laporan ===")
         try:
-            print(f"Report ID: {report['report_id']}")
-            print(f"Journal Name: {report['journal_name']}")
-            print(f"Journal URL: {report['journal_url']}")
-            print(f"Reason: {report['reason']}")
+            print(f"ID Laporan: {report['report_id']}")
+            print(f"Nama Jurnal: {report['journal_name']}")
+            print(f"URL Jurnal: {report['journal_url']}")
+            print(f"Alasan: {report['reason']}")
             print(f"Status Laporan: {report['status_laporan']}")
             print(f"Status Jurnal: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
-            print(f"Feedback: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
-            print(f"Date Submitted: {report['tanggal_laporan']}")
+            print(f"Umpan Balik: {report['feedback'] if not pd.isna(report['feedback']) else 'N/A'}")
+            print(f"Tanggal Dikirim: {report['tanggal_laporan']}")
 
             # Check if the report has been assigned to a validator
             if not pd.isna(report["validator_id"]):
@@ -162,25 +162,25 @@ class ReportController:
                 validator = validator_data[validator_data["validator_id"] == int(report["validator_id"])]
                 if not validator.empty:
                     validator = validator.iloc[0]  # Get the first match
-                    print("\n=== Validator Information ===")
-                    print(f"Validator Name: {validator['full_name']}")
+                    print("\n=== Informasi Validator ===")
+                    print(f"Nama Validator: {validator['full_name']}")
                     print(f"Validator Email: {validator['email']}")
-                    print(f"Validator Institution: {validator['instancy']}")
-                    print(f"Validator Position: {validator['academic_position']}")
-                    print(f"Scopus Profile: {validator['sinta_url']}")
-                    print(f"Sinta Profile: {validator['scopus_url']}")
-                    print(f"Google Scholar Profile: {validator['google_scholar_url']}")
+                    print(f"Validator Instansi: {validator['instancy']}")
+                    print(f"Validator Posisi Akademik: {validator['academic_position']}")
+                    print(f"Scopus Profil: {validator['sinta_url']}")
+                    print(f"Sinta Profil: {validator['scopus_url']}")
+                    print(f"Google Scholar Profil: {validator['google_scholar_url']}")
                 else:
-                    print("\nNo validator information found.")
+                    print("\nTidak ada informasi validator.")
             else:
-                print("\nThis report has not been assigned to a validator.")
+                print("\nLaporan ini belum ditugaskan kepada validator.")
 
         except Exception as e:
             print(f"Error: {e}")
 
     def list_pending_reports(self, validator_id):
         """Menampilkan daftar laporan dengan status 'pending'."""
-        print("\n=== Pending Reports ===")
+        print("\n=== Laporan Pending ===")
         try:
             # Membaca data laporan
             report_data = pd.read_csv(self.report_file)
@@ -189,8 +189,8 @@ class ReportController:
             pending_reports = report_data[report_data["status_laporan"] == "pending"]
 
             if pending_reports.empty:
-                print("No pending reports available.")
-                input("\nPress Enter to return to the Validator Menu...")
+                print("Tidak ada laporan yang menunggu untuk diproses.")
+                input("\nTekan Enter untuk kembali ke Menu Validator...")
                 return
 
             # Tampilkan laporan dalam bentuk tabel
@@ -198,30 +198,30 @@ class ReportController:
             print(tabulate(display_data, headers="keys", tablefmt="grid"))
 
             # Memilih laporan untuk melihat detail atau menerima
-            report_id = input("\nEnter Report ID to view details, accept, or 0 to return: ").strip()
+            report_id = input("\nMasukkan ID Laporan untuk melihat detail, terima, atau 0 untuk kembali: ").strip()
             if report_id == "0":
                 return
 
             try:
                 report_id = int(report_id)
             except ValueError:
-                print("Invalid Report ID. Please try again.")
+                print("ID Laporan Tidak Valid. Silakan coba lagi.")
                 return
 
             if report_id in pending_reports["report_id"].values:
                 # Panggil fungsi view_pending_report_details
                 self.view_pending_report_details(report_id, validator_id)
             else:
-                print("Report ID not found. Please try again.")
+                print("ID Laporan tidak ditemukan. Silakan coba lagi.")
 
         except FileNotFoundError:
-            print("No report data found.")
+            print("Tidak ada data laporan yang ditemukan.")
         except Exception as e:
             print(f"Error: {e}")
 
     def view_pending_report_details(self, report_id, validator_id):
         """Menampilkan detail laporan pending dan memberikan opsi untuk menerima laporan."""
-        print("\n=== Pending Report Details ===")
+        print("\n=== Detail Laporan Pending ===")
 
         try:
             # Baca data laporan
@@ -231,7 +231,7 @@ class ReportController:
             report = report_data[report_data["report_id"] == report_id]
 
             if report.empty:
-                print("Report not found.")
+                print("Laporan tidak ditemukan.")
                 return
 
             # Ambil informasi laporan
@@ -239,21 +239,21 @@ class ReportController:
 
             # Pastikan laporan berstatus "pending"
             if report["status_laporan"] != "pending":
-                print("This report is not pending and cannot be accepted.")
+                print("Laporan ini tidak dalam status pending dan tidak dapat diterima.")
                 return
 
             # Tentukan nama pelapor berdasarkan is_anonymous
             reporter_name = "Anonymous" if report["is_anonymous"] else report["full_name"]
 
-            print(f"Report ID: {report['report_id']}")
-            print(f"Reporter Name: {reporter_name}")
-            print(f"Journal Name: {report['journal_name']}")
-            print(f"Journal URL: {report['journal_url']}")
-            print(f"Reason: {report['reason']}")
-            print(f"Date Submitted: {report['tanggal_laporan']}")
+            print(f"ID Laporan: {report['report_id']}")
+            print(f"Nama Pelapor: {reporter_name}")
+            print(f"Nama Jurnal: {report['journal_name']}")
+            print(f"URL Jurnal: {report['journal_url']}")
+            print(f"Alasan: {report['reason']}")
+            print(f"Tanggal Dikirim: {report['tanggal_laporan']}")
 
             # Opsi untuk menerima laporan
-            choice = input("\nDo you want to accept this report for review? (Y/N): ").strip().lower()
+            choice = input("\nApakah Anda ingin menerima laporan ini untuk direview? (Y/N): ").strip().lower()
             if choice == "y":
                 # Pastikan kolom validator_id bertipe string
                 report_data["validator_id"] = report_data["validator_id"].fillna("").astype(str)
@@ -262,21 +262,21 @@ class ReportController:
                 report_data.loc[report_data["report_id"] == report_id, "status_laporan"] = "review"
                 report_data.loc[report_data["report_id"] == report_id, "validator_id"] = str(validator_id)
                 report_data.to_csv(self.report_file, index=False)
-                print(f"Report ID {report_id} has been accepted for review.")
+                print(f"ID Laporan {report_id} telah diterima untuk direview.")
             else:
-                print("Report was not accepted.")
+                print("Laporan tidak diterima.")
 
             # Kembali ke menu validator setelah selesai
-            input("\nPress Enter to return to the Validator Menu...")
+            input("\nTekan Enter untuk kembali ke Menu Validator...")
 
         except FileNotFoundError:
-            print("No report data found.")
+            print("Tidak ada data laporan yang ditemukan.")
         except Exception as e:
             print(f"Error: {e}")
     
     def list_accepted_reports(self, validator_id):
         """Menampilkan daftar laporan yang telah diterima validator."""
-        print("\n=== Accepted Reports ===")
+        print("\n=== Laporan Diterima ===")
         try:
             # Membaca data laporan
             report_data = pd.read_csv(self.report_file)
@@ -294,9 +294,9 @@ class ReportController:
             ]
 
             if accepted_reports.empty:
-                print("You have no accepted reports.")
-                print("This page will remain available for future reports.")
-                input("\nPress Enter to return to the Validator Menu...")
+                print("Anda tidak memiliki laporan yang diterima.")
+                print("Halaman ini akan tetap tersedia untuk laporan di masa depan.")
+                input("\nTekan Enter untuk kembali ke Menu Validator...")
                 return
 
             # Tampilkan laporan dalam bentuk tabel
@@ -307,42 +307,42 @@ class ReportController:
             print(tabulate(display_data, headers="keys", tablefmt="grid"))
 
             # Opsi untuk melihat detail laporan
-            report_id = input("\nEnter Report ID to manage or 0 to return: ").strip()
+            report_id = input("\nMasukkan ID Laporan untuk mengelola atau 0 untuk kembali: ").strip()
             if report_id == "0":
                 return
 
             try:
                 report_id = int(report_id)
             except ValueError:
-                print("Invalid Report ID. Please try again.")
+                print("ID Laporan Tidak Valid. Silakan coba lagi.")
                 return
 
             if report_id in accepted_reports["report_id"].values:
                 selected_report = accepted_reports[accepted_reports["report_id"] == report_id].iloc[0].to_dict()
                 self.manage_report(selected_report, validator_id)  # Pastikan validator_id dikirim
             else:
-                print("Invalid Report ID. Please try again.")
+                print("ID Laporan Tidak Valid. Silakan coba lagi.")
 
         except FileNotFoundError:
-            print("No report data file found.")
-            input("\nPress Enter to return to the Validator Menu...")
+            print("Tidak ada file data laporan yang ditemukan.")
+            input("\nTekan Enter untuk kembali ke Menu Validator...")
         except Exception as e:
             print(f"Error: {e}")
-            input("\nPress Enter to return to the Validator Menu...")
+            input("\nTekan Enter untuk kembali ke Menu Validator...")
 
     def update_report(self, report):
-        print("\n=== Update Report ===")
+        print("\n=== Perbarui Laporan ===")
         
-        print(f"Report ID: {report['report_id']}")
-        print(f"Current Journal Status: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
+        print(f"ID Laporan: {report['report_id']}")
+        print(f"Status Jurnal Saat Ini: {report['status_jurnal'] if not pd.isna(report['status_jurnal']) else 'N/A'}")
         
-        new_status = input("Enter new journal status (aman, predator, clone): ").strip().lower()
+        new_status = input("Masukkan status jurnal baru (aman, predator, clone): ").strip().lower()
         if new_status not in ["aman", "predator", "clone"]:
-            print("Invalid status. Please choose from aman, predator, or clone.")
+            print("Status tidak valid. Silakan pilih dari aman, predator, atau clone.")
             return
 
         # Meminta input untuk feedback baru
-        new_feedback = input("Enter new feedback: ").strip()
+        new_feedback = input("Masukkan umpan balik baru: ").strip()
 
         try:
             # Baca data laporan
@@ -354,10 +354,10 @@ class ReportController:
 
             # Simpan kembali ke file CSV
             report_data.to_csv(self.report_file, index=False)
-            print("Report updated successfully.")
+            print("Laporan berhasil diperbarui.")
 
         except Exception as e:
-            print(f"Error updating report: {e}")
+            print(f"Error: {e}")
 
     def manage_report(self, report, validator_id):
         """Fungsi untuk mengelola laporan yang diterima validator."""
@@ -366,29 +366,29 @@ class ReportController:
             report_data = pd.read_csv(self.report_file)
             updated_report = report_data[report_data["report_id"] == report["report_id"]].iloc[0].to_dict()
 
-            print("\n=== Manage Report ===")
-            print(f"Report ID: {updated_report['report_id']}")
-            print(f"Reporter Name: {updated_report['full_name'] if not updated_report['is_anonymous'] else 'Anonymous'}")
-            print(f"Journal Name: {updated_report['journal_name']}")
-            print(f"Journal URL: {updated_report['journal_url']}")
-            print(f"Reason: {updated_report['reason']}")
+            print("\n=== Kelola Laporan ===")
+            print(f"ID Laporan: {updated_report['report_id']}")
+            print(f"Nama Pelapor: {updated_report['full_name'] if not updated_report['is_anonymous'] else 'Anonymous'}")
+            print(f"Nama Jurnal: {updated_report['journal_name']}")
+            print(f"URL Jurnal: {updated_report['journal_url']}")
+            print(f"Alasan: {updated_report['reason']}")
             print(f"Status Laporan: {updated_report['status_laporan']}")
             print(f"Status Jurnal: {updated_report['status_jurnal'] if not pd.isna(updated_report['status_jurnal']) else 'N/A'}")
-            print(f"Feedback: {updated_report['feedback'] if not pd.isna(updated_report['feedback']) else 'N/A'}")
-            print(f"Date Submitted: {updated_report['tanggal_laporan']}")
+            print(f"Umpan Balik: {updated_report['feedback'] if not pd.isna(updated_report['feedback']) else 'N/A'}")
+            print(f"Tanggal Dikirim: {updated_report['tanggal_laporan']}")
 
-            print("\nOptions:")
+            print("\nOpsi:")
             
             # Menampilkan opsi berdasarkan status laporan
             if updated_report['status_laporan'] == 'review':
-                print("1. Validate Report")
-                print("2. Mark as Pending")
+                print("1. Validasi Laporan")
+                print("2. Tandai Sebagai Pending")
+                print("3. Kembali ke Laporan yang Diterima")
             elif updated_report['status_laporan'] == 'done':
-                print("1. Update Report")
-            
-            print("3. Return to Accepted Reports")
+                print("1. Perbarui Laporan")
+                print("2. Kembali ke Laporan yang Diterima")
 
-            choice = input("Choose an option: ").strip()
+            choice = input("Pilih Opsi: ").strip()
 
             if choice == "1":
                 if updated_report['status_laporan'] == 'review':
@@ -404,25 +404,28 @@ class ReportController:
                     self.mark_as_pending(updated_report)
                     self.list_accepted_reports(validator_id)
                     return
+                elif updated_report['status_laporan'] == 'done':
+                    self.list_accepted_reports(validator_id)
+                    return
             elif choice == "3":
                 self.list_accepted_reports(validator_id)
                 return
             else:
-                print("Invalid choice. Please try again.")
+                print("Pilihan tidak valid. Silakan coba lagi.")
 
     def validate_report(self, report):
         """Validasi laporan dengan mengupdate status jurnal dan feedback, lalu menandai sebagai done."""
-        print("\n=== Validate Report ===")
+        print("\n=== Validasi Laporan ===")
 
         # Update status jurnal
-        print("Options: aman, predator, clone")
-        new_status = input("Enter new journal status: ").strip().lower()
+        print("Opsi: aman, predator, clone")
+        new_status = input("Masukkan status jurnal baru: ").strip().lower()
         if new_status not in ["aman", "predator", "clone"]:
-            print("Invalid status. Please choose from aman, predator, or clone.")
+            print("Status tidak valid. Silakan pilih dari aman, predator, atau clone.")
             return
 
         # Tambahkan feedback
-        new_feedback = input("Enter your feedback: ").strip()
+        new_feedback = input("Masukkan umpan balik Anda:: ").strip()
 
         try:
             # Baca data laporan
@@ -435,20 +438,20 @@ class ReportController:
 
             # Simpan perubahan ke file CSV
             report_data.to_csv(self.report_file, index=False)
-            print("Report validated successfully. The status has been updated to 'done'.")
+            print("Laporan berhasil divalidasi. Status telah diperbarui menjadi 'done'.")
 
             # Tambahkan konfirmasi sebelum kembali
-            input("\nPress Enter to return to the Accepted Reports...")
+            input("\nTekan Enter untuk kembali ke Laporan yang Diterima...")
         except Exception as e:
             print(f"Error: {e}")
 
     def mark_as_pending(self, report):
         """Mengembalikan laporan ke status pending."""
-        print("\n=== Mark as Pending ===")
-        confirm = input("Are you sure you want to mark this report as pending? (Y/N): ").strip().lower()
+        print("\n=== Tandai Sebagai Pending ===")
+        confirm = input("Apakah Anda yakin ingin menandai laporan ini sebagai pending? (Y/N): ").strip().lower()
 
         if confirm != "y":
-            print("Operation canceled.")
+            print("Operasi dibatalkan.")
             return
 
         try:
@@ -460,8 +463,8 @@ class ReportController:
             report_data.loc[report_data["report_id"] == report["report_id"], "validator_id"] = None
             report_data.to_csv(self.report_file, index=False)
 
-            print("Report marked as pending.")
-            input("\nPress Enter to return to the Validator Menu...")
+            print("Laporan berhasil ditandai sebagai pending.")
+            input("\nTekan Enter untuk kembali ke Menu Validator...")
             raise StopIteration  # Digunakan untuk keluar dari loop manage_report
 
         except StopIteration:
@@ -471,7 +474,7 @@ class ReportController:
 
     def accept_report(self, report, validator_id):
         """Menerima laporan untuk direview oleh validator."""
-        print("\n=== Accept Report ===")
+        print("\n=== Terima Laporan ===")
         try:
             # Baca data laporan
             report_data = pd.read_csv(self.report_file)
@@ -482,36 +485,36 @@ class ReportController:
 
             # Simpan kembali ke file CSV
             report_data.to_csv(self.report_file, index=False)
-            print(f"Report ID {report['report_id']} has been accepted for review.")
+            print(f"ID Laporan {report['report_id']} telah diterima untuk direview.")
         except Exception as e:
             print(f"Error: {e}")
 
     def edit_report(self, report):
         clear_screen()
-        print("\n=== Edit Report ===")
-        print(f"Current Journal Name: {report['journal_name']}")
-        print(f"Current Journal URL: {report['journal_url']}")
-        print(f"Current Reason: {report['reason']}")
-        print("\nOptions:")
-        print("1. Edit Report")
-        print("2. Delete Report")
-        print("0. Return to Tracking Reports")
+        print("\n=== Edit Laporan ===")
+        print(f"Nama Jurnal Saat Ini: {report['journal_name']}")
+        print(f"URL Jurnal Saat Ini: {report['journal_url']}")
+        print(f"Alasan Saat Ini: {report['reason']}")
+        print("\nOpsi:")
+        print("1. Edit Laporan")
+        print("2. Hapus Laporan")
+        print("0. Kembali ke Pelacakan Laporan")
 
-        choice = input("Choose an option: ").strip()
+        choice = input("Pilih opsi: ").strip()
 
         if choice == "1":
-            new_journal_name = input("Enter new journal name (leave blank to keep current): ").strip()
+            new_journal_name = input("Masukkan nama jurnal baru (kosongkan untuk mempertahankan yang saat ini): ").strip()
             
             while True:
-                new_journal_url = input("Enter new journal URL (leave blank to keep current): ").strip()
+                new_journal_url = input("Masukkan URL jurnal baru (kosongkan untuk mempertahankan yang saat ini): ").strip()
                 if not new_journal_url:
                     break
                 elif not self.is_valid_url(new_journal_url):
-                    print("Invalid URL. Please enter a valid URL starting with 'http://' or 'https://', containing a domain, and without spaces.")
+                    print("URL tidak valid. Silakan masukkan URL yang valid dimulai dengan 'http://' atau 'https://', mengandung domain, dan tanpa spasi.")
                 else:
                     break
             
-            new_reason = input("Enter new reason (leave blank to keep current): ").strip()
+            new_reason = input("Masukkan alasan baru (kosongkan untuk mempertahankan yang saat ini): ").strip()
 
             # Update hanya jika input tidak kosong
             if new_journal_name:
@@ -532,19 +535,19 @@ class ReportController:
 
                 # Simpan kembali ke file CSV
                 report_data.to_csv(self.report_file, index=False)
-                print("Report updated successfully. Redirecting...")
+                print("Laporan berhasil diperbarui. Redirecting...")
                 time.sleep(2)
 
                 # Tampilkan detail laporan yang telah diperbarui
                 self.view_report_details(report)  # Tampilkan detail setelah edit
 
             except Exception as e:
-                print(f"Error updating report: {e}")
+                print(f"Error: {e}")
 
         elif choice == "2":
             # Hapus laporan jika statusnya pending
             if report["status_laporan"] == "pending":
-                confirm = input("Are you sure you want to delete this report? (Y/N): ").strip().lower()
+                confirm = input("Apakah Anda yakin ingin menghapus laporan ini? (Y/N): ").strip().lower()
                 if confirm == "y":
                     try:
                         # Baca data laporan
@@ -555,19 +558,19 @@ class ReportController:
 
                         # Simpan kembali ke file CSV
                         report_data.to_csv(self.report_file, index=False)
-                        print("Report deleted successfully, Redirecting...")
+                        print("Laporan berhasil dihapus, Redirecting...")
                         time.sleep(2)
                     except Exception as e:
-                        print(f"Error deleting report: {e}")
+                        print(f"Error: {e}")
                 else:
-                    print("Deletion canceled.")
+                    print("Penghapusan dibatalkan.")
             else:
-                print("You can only delete reports with 'pending' status.")
+                print("Anda hanya dapat menghapus laporan dengan status 'pending'.")
 
         elif choice == "0":
             return  # Kembali ke menu Tracking Reports
         else:
-            print("Invalid choice. Please try again.")
+            print("Pilihan tidak valid. Silakan coba lagi.")
             
     def view_user_statistics(self, user_id):
         try:
@@ -580,14 +583,14 @@ class ReportController:
             review_reports = len(user_reports[user_reports["status_laporan"] == "review"])  # Laporan Review
             done_reports = len(user_reports[user_reports["status_laporan"] == "done"])  # Laporan Sukses
 
-            print("=== Your Report Statistics ===")
+            print("=== Statistik Laporan Anda ===")
             print(f"Total Laporan: {total_reports}")
             print(f"Laporan Pending: {pending_reports}")
             print(f"Laporan Review: {review_reports}")
             print(f"Laporan Sukses: {done_reports}")
 
         except FileNotFoundError:
-            print("No report data file found.")
+            print("Tidak ada file data laporan yang ditemukan..")
         except Exception as e:
             print(f"Error: {e}")
             
@@ -604,14 +607,14 @@ class ReportController:
             total_handled = total_review + total_done
 
             # Tampilkan statistik
-            print("\n=== Validator Statistics ===")
+            print("\n=== Statistik Validator ===")
             print(f"Total Laporan Tersedia: {total_pending}")
             print(f"Laporan yang Sedang Direview: {total_review}")
             print(f"Laporan yang Sudah Selesai: {total_done}")
             print(f"Total Laporan Ditangani: {total_handled}")
 
         except FileNotFoundError:
-            print("No report data found.")
+            print("Tidak ada data laporan yang ditemukan..")
         except Exception as e:
             print(f"Error: {e}")
             
@@ -619,10 +622,3 @@ class ReportController:
     def is_valid_url(self, url):
         """Validasi URL menggunakan regex."""
         return re.match(r"^(http|https)://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/[^ ]*)?$", url) is not None and ' ' not in url
-    
-    
-    # User Functions
-    
-    
-    
-    #Validator Functions

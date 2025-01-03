@@ -13,11 +13,11 @@ class AuthController:
 
     def login(self):
         # Multi Role Login
-        print("\n=== Login ===")
+        print("\n=== Masuk ===")
 
         while True:
-            username = input("Enter username: ").strip()
-            password = input("Enter password: ").strip()
+            username = input("Masukkan Username: ").strip()
+            password = input("Masukkan Password: ").strip()
 
             try:
                 # Periksa user
@@ -26,11 +26,11 @@ class AuthController:
                 if not user.empty:
                     if user.iloc[0]["password"] == password:
                         self.current_user = user.iloc[0].to_dict()
-                        print(f"Login successful! Welcome, {username} (User). Redirecting...")
+                        print(f"Masuk berhasil! Selamat datang, {username} (User). Redirecting...")
                         time.sleep(2)
                         return "user"
                     else:
-                        print("Invalid password. Please try again.")
+                        print("Password salah. Silakan coba lagi.")
                         continue
 
                 # Periksa validator
@@ -39,11 +39,11 @@ class AuthController:
                 if not validator.empty:
                     if validator.iloc[0]["password"] == password:
                         self.current_user = validator.iloc[0].to_dict()
-                        print(f"Login successful! Welcome, {username} (Validator). Redirecting...")
+                        print(f"Masuk berhasil! Selamat datang, {username} (Validator). Redirecting...")
                         time.sleep(2)
                         return "validator"
                     else:
-                        print("Invalid password. Please try again.")
+                        print("Password salah. Silakan coba lagi.")
                         continue
 
                 # Periksa admin
@@ -52,60 +52,60 @@ class AuthController:
                 if not admin.empty:
                     if admin.iloc[0]["password"] == password:
                         self.current_user = admin.iloc[0].to_dict()
-                        print(f"Login successful! Welcome, {username} (Admin). Redirecting...")
+                        print(f"Masuk berhasil! Selamat datang, {username} (Admin). Redirecting...")
                         time.sleep(2)
                         return "admin"
                     else:
-                        print("Invalid password. Please try again.")
+                        print("Password salah. Silakan coba lagi.")
                         continue
 
-                print("Invalid username. Please try again.")
+                print("Username tidak valid. Silakan coba lagi.")
             except Exception as e:
                 print(f"Error: {e}")
                 return None
 
     def register_user(self):
         clear_screen()
-        print("\n=== Register User ===")
+        print("\n=== Daftar Pengguna ===")
 
         while True:
-            username = input("Enter username: ").strip()
+            username = input("Masukkan username: ").strip()
             if not self.is_valid_username(username):
-                print("Username must be at least 8 characters and can only contain letters, numbers, '_', and '.'.")
+                print("Username harus terdiri dari minimal 8 karakter dan hanya boleh terdiri dari huruf, angka, '_', dan '.'")
                 continue
             # Cek apakah username sudah ada
             user_data = self.user_model.read_data()
             if not user_data[user_data["username"] == username].empty:
-                print("Username already exists. Please choose another one.")
+                print("Nama pengguna sudah ada. Pilih nama pengguna yang lain.")
                 continue
             break
 
         # Validasi Password
         while True:
-            password = input("Enter password: ").strip()
+            password = input("Masukkan password: ").strip()
             if not self.is_valid_password(password):
-                print("Password must be at least 8 characters.")
+                print("Password harus terdiri dari minimal 8 karakter.")
                 continue
             break
 
         # Validasi Full Name
-        full_name = input("Enter full name: ").strip()
+        full_name = input("Masukkan nama lengkap: ").strip()
 
         # Validasi Email
         while True:
-            email = input("Enter email: ").strip()
+            email = input("Masukkan email: ").strip()
             if not self.is_valid_email(email):
-                print("Invalid email format. Please try again.")
+                print("Format email tidak valid. Silakan coba lagi..")
                 continue
             # Cek apakah email sudah digunakan oleh user lain
             user_data = self.user_model.read_data()
             if not user_data[user_data["email"] == email].empty:
-                print("Email already exists. Please choose another one.")
+                print("Email sudah digunakan. Silakan pilih email lain.")
                 continue
             break
 
         # Validasi Instancy
-        instancy = input("Enter instancy: ").strip()
+        instancy = input("Masukkan instansi: ").strip()
 
         # Tambahkan user baru
         new_user = {
@@ -119,67 +119,67 @@ class AuthController:
         }
         user_data = pd.concat([user_data, pd.DataFrame([new_user])], ignore_index=True)
         self.user_model.write_data(user_data)
-        print("Registration successful!")
+        print("Pendaftaran berhasil!")
     
     def register_validator(self):
         clear_screen()
-        print("\n=== Register Validator ===")
+        print("\n=== Daftar Validator ===")
 
         # Validasi Username
         while True:
-            username = input("Enter username: ").strip()
+            username = input("Masukkan username: ").strip()
             if not self.is_valid_username(username):
-                print("Username must be at least 8 characters and can only contain letters, numbers, '_', and '.'.")
+                print("Username harus terdiri dari minimal 8 karakter dan hanya boleh terdiri dari huruf, angka, '_', dan '.'")
                 continue
             # Cek apakah username sudah ada
             validator_data = self.validator_model.read_data()
             if not validator_data[validator_data["username"] == username].empty:
-                print("Username already exists. Please choose another one.")
+                print("Nama pengguna sudah ada. Silakan pilih nama pengguna yang lain..")
                 continue
             break
 
         # Validasi Password
         while True:
-            password = input("Enter password: ").strip()
+            password = input("Masukkan password: ").strip()
             if not self.is_valid_password(password):
-                print("Password must be at least 8 characters.")
+                print("Password harus terdiri dari minimal 8 karakter.")
                 continue
             break
 
         # Validasi Full Name
         while True:
-            full_name = input("Enter full name: ").strip()
+            full_name = input("Masukkan nama lengkap: ").strip()
             if not full_name:
-                print("Full name cannot be empty. Please try again.")
+                print("Nama lengkap tidak boleh kosong. Silakan coba lagi.")
             else:
                 break
             
         # Validasi Email
         while True:
-            email = input("Enter email: ").strip()
+            email = input("Masukkan email: ").strip()
             if not self.is_valid_email(email):
-                print("Invalid email format. Please try again.")
+                print("Format email tidak valid. Silakan coba lagi..")
                 continue
             # Cek apakah email sudah digunakan oleh user lain
             validator_data = self.validator_model.read_data()
             if not validator_data[validator_data["email"] == email].empty:
-                print("Email already exists. Please choose another one.")
+                print("Email sudah digunakan. Silakan pilih email lain..")
                 continue
             break
 
         # Validasi Instancy
         while True:
-            instancy = input("Enter instancy: ").strip()
+            instancy = input("Masukkan instansi: ").strip()
             if not instancy:
-                print("Instancy cannot be empty. Please try again.")
+                print("Instansi tidak boleh kosong. Silakan coba lagi..")
             else:
                 break
 
         # Validasi Academic Position
         while True:
-            academic_position = input("Enter academic position: ").strip()
+            academic_position = input("Masukkan posisi akademik: ").strip()
             if not academic_position:
-                print("Academic position cannot be empty. Please try again.")
+                print("Posisi akademik tidak boleh kosong. Silakan coba lagi.")
             else:
                 break
 
@@ -204,23 +204,23 @@ class AuthController:
         }
         validator_data = pd.concat([validator_data, pd.DataFrame([new_validator])], ignore_index=True)
         self.validator_model.write_data(validator_data)
-        print("Validator registration successful!")
+        print("Pendaftaran validator berhasil!!")
 
     # User Setting Functionality
     def user_settings(self):
         """Fitur untuk mengedit informasi user dan mengubah password."""
         if not self.current_user:
-            print("You must be logged in to access settings.")
+            print("Anda harus login untuk mengakses pengaturan")
             return
         
         clear_screen()
 
         while True:
-            print("\n=== User Settings ===")
-            print("1. Edit Profile Information")
-            print("2. Change Password")
-            print("3. Return to User Menu")
-            choice = input("Choose an option: ").strip()
+            print("\n=== Pengaturan Pengguna ===")
+            print("1. Edit Informasi Profil")
+            print("2. Ganti Password")
+            print("3. Kembali ke Menu Pengguna")
+            choice = input("Pilih opsi: ").strip()
 
             if choice == "1":
                 self.edit_profile()
@@ -229,35 +229,35 @@ class AuthController:
             elif choice == "3":
                 break
             else:
-                print("Invalid choice. Please try again.")
+                print("Pilihan tidak valid. Silakan coba lagi..")
 
     def edit_profile(self):
         """Mengedit informasi profil user."""
-        print("\n=== Edit Profile ===")
+        print("\n=== Edit Informasi Profil ===")
         user_data = self.user_model.read_data()
         user_id = self.current_user["user_id"]
         user = user_data[user_data["user_id"] == user_id].iloc[0]
 
         # Tampilkan informasi saat ini
-        print(f"Current Full Name: {user['full_name']}")
-        print(f"Current Email: {user['email']}")
-        print(f"Current Instancy: {user['instancy']}")
+        print(f"Nama Lengkap Saat Ini: {user['full_name']}")
+        print(f"Email Saat Ini: {user['email']}")
+        print(f"Instansi Saat Ini: {user['instancy']}")
 
         # Input untuk mengedit informasi
-        new_full_name = input("Enter new full name (leave blank to keep current): ").strip()
+        new_full_name = input("Masukkan nama lengkap baru (kosongkan untuk mempertahankan yang saat ini): ").strip()
         
         # Validasi email baru
         while True:
-            new_email = input("Enter new email (leave blank to keep current): ").strip()
+            new_email = input("Masukkan email baru (kosongkan untuk mempertahankan yang saat ini):: ").strip()
             if new_email:  # Jika pengguna memasukkan email baru
                 if not self.is_valid_email(new_email):  # Validasi email
-                    print("Invalid email format. Please enter a valid email address (e.g., example@domain.com).")
+                    print("Format email tidak valid. Silakan masukkan alamat email yang valid (contoh: example@domain.com).")
                 else:
                     break  # Keluar dari loop jika email valid
             else:
                 break  # Keluar dari loop jika pengguna tidak memasukkan email baru
 
-        new_instancy = input("Enter new instancy (leave blank to keep current): ").strip()
+        new_instancy = input("Masukkan instansi baru (kosongkan untuk mempertahankan yang saat ini): ").strip()
 
         # Update informasi jika input tidak kosong
         if new_full_name:
@@ -269,33 +269,33 @@ class AuthController:
 
         # Simpan perubahan
         self.user_model.write_data(user_data)
-        print("Profile updated successfully.")
+        print("Profil berhasil diperbarui.")
 
     def change_password(self):
         """Mengubah password user."""
-        print("\n=== Change Password ===")
+        print("\n=== Ganti Password ===")
         user_data = self.user_model.read_data()
         user_id = self.current_user["user_id"]
         user = user_data[user_data["user_id"] == user_id].iloc[0]
 
         # Minta password lama untuk verifikasi
-        old_password = input("Enter your current password: ").strip()
+        old_password = input("Masukkan password saat ini:: ").strip()
         if old_password != user["password"]:
-            print("Incorrect password. Please try again.")
+            print("Password salah. Silakan coba lagi..")
             return
 
         # Minta password baru
         while True:
-            new_password = input("Enter new password: ").strip()
+            new_password = input("Masukkan password baru: ").strip()
             if self.is_valid_password(new_password):
                 break
             else:
-                print("Password must be at least 8 characters.")
+                print("Password harus terdiri dari minimal 8 karakter.")
 
         # Update password
         user_data.loc[user_data["user_id"] == user_id, "password"] = new_password
         self.user_model.write_data(user_data)
-        print("Password changed successfully.")
+        print("Password berhasil diubah.")
         
     # Validation Rule
     def is_valid_username(self, username):
@@ -318,16 +318,16 @@ class AuthController:
 
     def get_valid_url(self, url_type, current_url):
         while True:
-            print(f"\nEnter {url_type} URL (must start with 'http://' or 'https://', contain a valid domain, and be at least 10 characters long):")
+            print(f"\nMasukkan {url_type} URL (harus dimulai dengan 'http://' atau 'https://', mengandung domain yang valid, dan minimal 10 karakter panjang):")
             new_url = input().strip()
             
             # Validasi URL
             if not new_url.startswith(("http://", "https://")):
-                print(f"Invalid {url_type} URL. It must start with 'http://' or 'https://'.")
+                print(f"{url_type} URL tidak valid . Harus dimulai dengan 'http://' atau 'https://'.")
             elif not "." in new_url:  # Minimal harus ada domain (contoh: example.com)
-                print(f"Invalid {url_type} URL. It must contain a valid domain.")
+                print(f"{url_type} URL tidak valid . Harus mengandung domain yang valid.")
             elif len(new_url) < 10:
-                print(f"Invalid {url_type} URL. It must be at least 10 characters long.")
+                print(f"{url_type} URL tidak valid . Panjangnya minimal 10 karakter.")
             else:
-                return new_url  # Kembalikan URL yang valid jika semua validasi terpenuhi
+                return new_url
 
