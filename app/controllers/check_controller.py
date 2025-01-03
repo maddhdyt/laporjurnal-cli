@@ -1,4 +1,5 @@
 import pandas as pd
+from utils import clear_screen
 from tabulate import tabulate
 
 class CheckController:
@@ -6,7 +7,7 @@ class CheckController:
         self.report_file = report_file
 
     def check_journal_url(self, journal_url):
-        """Memeriksa apakah URL jurnal tersedia dalam tb_report.csv."""
+        clear_screen()
         # Validasi URL
         if not journal_url.startswith("http"):
             print("Error: URL harus dimulai dengan 'http'. Silakan coba lagi.")
