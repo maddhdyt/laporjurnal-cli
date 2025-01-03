@@ -9,8 +9,8 @@ import time
 def user_menu(auth, report_controller):
     while True:
         user_id = auth.get_current_user_id()
+        clear_screen()
 
-        # Statistik + menu user
         report_controller.view_user_statistics(user_id)
         show_user_menu()
         
@@ -23,10 +23,10 @@ def user_menu(auth, report_controller):
         elif choice == "2":
             report_controller.track_reports(user_id)
             input("\nTekan Enter untuk kembali ke menu pengguna...")
-        elif choice == "3":  # Opsi Settings
-            auth.user_settings()  # Panggil fungsi user_settings dari AuthController
+        elif choice == "3": 
+            auth.user_settings() 
             input("\nTekan Enter untuk kembali ke menu pengguna...")
-        elif choice == "4":  # Opsi Logout
+        elif choice == "4": 
             print("Keluar...")
             time.sleep(2)
             break
@@ -37,7 +37,7 @@ def user_menu(auth, report_controller):
 def validator_menu(auth, report_controller):
     validator_id = auth.current_user.get("validator_id") #ambil validator_id yang sedang login
     while True:        
-        # statistik + menu validator
+        clear_screen()
         report_controller.show_validator_statistics(validator_id)
         show_validator_menu()
         
@@ -60,7 +60,6 @@ def validator_menu(auth, report_controller):
 def admin_menu(auth):
     admin_controller = AdminController()  # AdminController init
     while True:
-        
         clear_screen()
         # statistik + admin menu
         admin_controller.view_statistics()
@@ -98,7 +97,7 @@ def main():
         show_main_menu()
         choice = input("Pilih Opsi: ")
 
-        if choice == "1": # Login
+        if choice == "1":
             clear_screen()
             role = auth.login()
             if role == "user":
@@ -107,12 +106,12 @@ def main():
                 validator_menu(auth, report_controller)
             elif role == "admin":
                 admin_menu(auth)
-        elif choice == "2":  # Register User
+        elif choice == "2": 
             auth.register_user()
             input("\nTekan Enter untuk kembali ke menu utama...")
-        elif choice == "3":  # Check Journal URL
+        elif choice == "3": 
             journal_url = input("Masukkan URL jurnal untuk diperiksa: ").strip()
-            check_controller.check_journal_url(journal_url)  # Panggil fungsi untuk memeriksa URL
+            check_controller.check_journal_url(journal_url) 
             input("\nTekan Enter untuk kembali ke menu utama...")
         elif choice == "4":
             print("Terima Kasih telah menggunakan aplikasi kami!")
