@@ -282,8 +282,13 @@ class AdminController:
                     return
                 
                 elif choice == "3":
-                    self.delete_validator(validator_id)  # Panggil metode delete_validator
-                    return
+                    confirm = input("Apakah Anda yakin ingin menghapus validator ini? (Y/N): ").strip().lower()
+                    if confirm == "y":
+                        self.delete_validator(validator_id)  # Panggil metode delete_validator
+                        return
+                    else:
+                        print("Penghapusan dibatalkan.")
+                        continue
                 
                 elif choice == "4":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
@@ -407,8 +412,13 @@ class AdminController:
                     return
                 
                 elif choice == "3":
-                    self.delete_validator(validator_id) # Panggil metode delete_validator
-                    return
+                    confirm = input("Apakah Anda yakin ingin menghapus validator ini? (Y/N): ").strip().lower()
+                    if confirm == "y":
+                        self.delete_validator(validator_id)  # Panggil metode delete_validator
+                        return
+                    else:
+                        print("Penghapusan dibatalkan.")
+                        continue
 
                 elif choice == "4":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
@@ -489,8 +499,13 @@ class AdminController:
                     return
                 
                 elif choice == "3":
-                    self.delete_validator(validator_id)  # Panggil metode delete_validator
-                    return
+                    confirm = input("Apakah Anda yakin ingin menghapus validator ini? (Y/N): ").strip().lower()
+                    if confirm == "y":
+                        self.delete_validator(validator_id)  # Panggil metode delete_validator
+                        return
+                    else:
+                        print("Penghapusan dibatalkan.")
+                        continue
 
                 elif choice == "4":
                     self.view_all_validators()  # Tampilkan tabel validator lagi
