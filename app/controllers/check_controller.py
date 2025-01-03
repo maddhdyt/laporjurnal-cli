@@ -22,14 +22,12 @@ class CheckController:
 
             if journal_info.empty:
                 print("Informasi jurnal tidak ditemukan untuk URL yang diberikan.")
-                return  # Keluar dari fungsi jika jurnal tidak ditemukan
+                return
 
-            # Tampilkan tabel semua laporan dengan URL yang sama
             print("\n=== Laporan dengan URL yang sama ===")
             display_data = journal_info[["report_id", "full_name", "status_laporan", "tanggal_laporan"]]
             print(tabulate(display_data, headers="keys", tablefmt="grid"))
 
-            # Minta user untuk memilih laporan yang ingin dilihat detailnya
             while True:
                 report_id = input("\nMasukkan ID Laporan untuk melihat detail atau 0 untuk kembali: ").strip()
                 if report_id == "0":
@@ -38,10 +36,9 @@ class CheckController:
                 try:
                     report_id = int(report_id)
                     if report_id in journal_info["report_id"].values:
-                        # Ambil detail laporan yang dipilih
                         selected_report = journal_info[journal_info["report_id"] == report_id].iloc[0]
                         self.display_report_details(selected_report)
-                        break  # Keluar dari loop setelah menampilkan detail
+                        break 
                     else:
                         print("ID laporan tidak ditemukan. Silakan coba lagi.")
                 except ValueError:
@@ -53,27 +50,22 @@ class CheckController:
             print(f"Error: {e}")
 
     def display_report_details(self, report):
-        """Menampilkan detail laporan yang dipilih sesuai format view_report_details."""
         try:
-            # Baca semua database sekaligus
             user_data = pd.read_csv("database/tb_user.csv")
             validator_data = pd.read_csv("database/tb_validator.csv")
     
-            # Cari data user dan validator berdasarkan ID
             user_id = report['user_id']
             validator_id = report['validator_id']
     
             user = user_data[user_data["user_id"] == user_id]
             validator = validator_data[validator_data["validator_id"] == int(validator_id)] if pd.notna(validator_id) else pd.DataFrame()
     
-            # Tampilkan detail laporan
             print("\n=== Detail Laporan ===")
             print(f"ID Laporan: {report['report_id']}")
             print(f"Tanggal Dikirim: {report['tanggal_laporan']}")
             print(f"Nama Jurnal: {report['journal_name']}")
             print(f"URL Jurnal: {report['journal_url']}")
     
-            # Tampilkan nama dan instansi pelapor
             if not user.empty:
                 user = user.iloc[0]  # Ambil baris pertama
                 print(f"Nama Pelapor: {user['full_name']}")
@@ -84,7 +76,6 @@ class CheckController:
     
             print(f"Alasan: {report['reason']}")
     
-            # Tampilkan hasil review (jika ada)
             print("\n=== Hasil Review ===")
             if not validator.empty:
                 validator = validator.iloc[0]  # Ambil baris pertama

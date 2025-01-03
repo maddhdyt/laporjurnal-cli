@@ -1,7 +1,4 @@
-from utils import clear_screen
-
 def show_main_menu():
-    clear_screen()
     print("\n=== Menu Utama ===")
     print("1. Masuk")
     print("2. Daftar")
@@ -9,7 +6,6 @@ def show_main_menu():
     print("4. Keluar")
 
 def show_user_menu():
-    clear_screen()
     print("\n=== Menu Pengguna ===")
     print("1. Laporkan Jurnal")
     print("2. Lacak Laporan")
@@ -17,14 +13,12 @@ def show_user_menu():
     print("4. Keluar")
 
 def show_validator_menu():
-    clear_screen()
     print("\n=== Menu Validator ===")
-    print("1. Melihat Laporan Tertunda")
-    print("2. Melihat Laporan yang Diterima")
+    print("1. Lihat Laporan Tersedia")
+    print("2. Kelola Laporan")
     print("3. Keluar")
 
 def show_admin_menu():
-    clear_screen()
     print("\n=== Menu Admin ===")
     print("1. Daftar Validator")
     print("2. Lihat Semua Laporan")  

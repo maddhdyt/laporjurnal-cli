@@ -208,7 +208,6 @@ class AuthController:
 
     # User Setting Functionality
     def user_settings(self):
-        """Fitur untuk mengedit informasi user dan mengubah password."""
         if not self.current_user:
             print("Anda harus login untuk mengakses pengaturan")
             return
@@ -232,25 +231,22 @@ class AuthController:
                 print("Pilihan tidak valid. Silakan coba lagi..")
 
     def edit_profile(self):
-        """Mengedit informasi profil user."""
         print("\n=== Edit Informasi Profil ===")
         user_data = self.user_model.read_data()
         user_id = self.current_user["user_id"]
         user = user_data[user_data["user_id"] == user_id].iloc[0]
 
-        # Tampilkan informasi saat ini
         print(f"Nama Lengkap Saat Ini: {user['full_name']}")
         print(f"Email Saat Ini: {user['email']}")
         print(f"Instansi Saat Ini: {user['instancy']}")
 
-        # Input untuk mengedit informasi
         new_full_name = input("Masukkan nama lengkap baru (kosongkan untuk mempertahankan yang saat ini): ").strip()
         
         # Validasi email baru
         while True:
             new_email = input("Masukkan email baru (kosongkan untuk mempertahankan yang saat ini):: ").strip()
-            if new_email:  # Jika pengguna memasukkan email baru
-                if not self.is_valid_email(new_email):  # Validasi email
+            if new_email:  
+                if not self.is_valid_email(new_email):  
                     print("Format email tidak valid. Silakan masukkan alamat email yang valid (contoh: example@domain.com).")
                 else:
                     break  # Keluar dari loop jika email valid
@@ -259,7 +255,6 @@ class AuthController:
 
         new_instancy = input("Masukkan instansi baru (kosongkan untuk mempertahankan yang saat ini): ").strip()
 
-        # Update informasi jika input tidak kosong
         if new_full_name:
             user_data.loc[user_data["user_id"] == user_id, "full_name"] = new_full_name
         if new_email:
@@ -267,7 +262,6 @@ class AuthController:
         if new_instancy:
             user_data.loc[user_data["user_id"] == user_id, "instancy"] = new_instancy
 
-        # Simpan perubahan
         self.user_model.write_data(user_data)
         print("Profil berhasil diperbarui.")
 
@@ -299,19 +293,15 @@ class AuthController:
         
     # Validation Rule
     def is_valid_username(self, username):
-        """Validasi username."""
         return re.match(r"^[a-zA-Z0-9_.]{8,}$", username)
 
     def is_valid_password(self, password):
-        """Validasi password."""
         return len(password) >= 8
 
     def is_valid_email(self, email):
-        """Validasi email menggunakan regex yang benar."""
         return re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email) is not None
 
     def get_current_user_id(self):
-        """Kembalikan user_id dari pengguna yang login."""
         if self.current_user:
             return self.current_user.get("user_id")
         return None
@@ -324,7 +314,7 @@ class AuthController:
             # Validasi URL
             if not new_url.startswith(("http://", "https://")):
                 print(f"{url_type} URL tidak valid . Harus dimulai dengan 'http://' atau 'https://'.")
-            elif not "." in new_url:  # Minimal harus ada domain (contoh: example.com)
+            elif not "." in new_url:
                 print(f"{url_type} URL tidak valid . Harus mengandung domain yang valid.")
             elif len(new_url) < 10:
                 print(f"{url_type} URL tidak valid . Panjangnya minimal 10 karakter.")

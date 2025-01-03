@@ -1,5 +1,3 @@
 user_id,username,password,full_name,email,instancy,role
-1,user1,12345678,Program User,programuser@gmail.com,UGM,user
-2,user2,pass456,Jane Smith,jane@example.com,Company B,user
 3,maddhdyt,dukahilap,Ahmad,madd.hdyt@gmail.com,upi,user
-6,maddhdyt0,dukahilap,ahmad hidayat,madd.hdyt@gmail.com,upi,user
+4,dadanhdyt,dukahilap,Dadan Hidayat,dadanhidayat@gmail.com,mardira,user
